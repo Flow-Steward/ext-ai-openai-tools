@@ -136,3 +136,64 @@ def test_moderate_image_uses_data_url():
         request.call_args.args[1]["input"][0]["image_url"]["url"]
         == "data:image/png;base64,cG5n"
     )
+
+
+def test_speech_saves_mp3():
+    with patch.object(
+        provider, "request_bytes", return_value=(b"mp3", "req_speech")
+    ) as request:
+        result = provider.perform(
+            "speech",
+            {"text": "hello", "voice": "coral"},
+            "secret",
+            {"write": lambda data, mime: mime},
+        )
+    assert request.call_args.args[0] == "/audio/speech"
+    assert result == {
+        "output_artifact_handle": "audio/mpeg",
+        "request_id": "req_speech",
+    }
+
+
+def test_transcription_returns_text():
+    with patch.object(
+        provider, "request_bytes", return_value=(b'{"text":"hello"}', "req_audio")
+    ) as request:
+        result = provider.perform(
+            "transcribe",
+            {"artifact_handle": "a", "filename": "voice.wav"},
+            "secret",
+            {"read": lambda _: b"audio"},
+        )
+    assert request.call_args.args[0] == "/audio/transcriptions"
+    assert b"gpt-transcribe" in request.call_args.args[1]
+    assert result == {"text": "hello", "request_id": "req_audio"}
+
+
+def test_artifact_save_failure_retains_paid_request_id():
+    def fail(*_):
+        raise OSError("disk error")
+
+    with patch.object(provider, "request_bytes", return_value=(b"audio", "req_paid")):
+        with pytest.raises(provider.ProviderError) as error:
+            provider.perform("speech", {"text": "hello"}, "secret", {"write": fail})
+    assert error.value.code == "outcome_unknown"
+    assert error.value.request_id == "req_paid"
+
+
+def test_authentication_error_is_safe():
+    from urllib.error import HTTPError
+
+    error = HTTPError(
+        "https://api.openai.com/v1/test",
+        401,
+        "Unauthorized",
+        {"x-request-id": "req_auth"},
+        None,
+    )
+    with patch("urllib.request.OpenerDirector.open", side_effect=error):
+        with pytest.raises(provider.ProviderError) as result:
+            provider.request_json("/test", {}, "secret")
+    assert result.value.code == "authentication_failed"
+    assert result.value.request_id == "req_auth"
+    assert "secret" not in str(result.value)
