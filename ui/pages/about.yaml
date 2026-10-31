@@ -1,0 +1,33 @@
+page_id: about
+title: About & Connection
+components:
+- component_id: about_openai
+  type: markdown
+  body: '## OpenAI Tools
+
+
+    Use decisions (predicate probability, choice, score ordered levels), text or image
+    moderation, image generation and edits, transcription, and speech in workflow
+    Extension tools steps. Calls send your data to OpenAI and may incur charges.
+
+
+    ### Connect
+
+
+    1. Create an OpenAI API project and API key at https://platform.openai.com/api-keys.
+    Ensure the project has access to the selected models and billing where required.
+
+    2. In your Flow Steward project, create an OpenAI API connection and save its
+    key in the encrypted API key field.
+
+    3. Add an OpenAI Tools operation to a workflow and select that connection. Supply
+    the required inputs and run.
+
+
+    Images use PNG artifacts; audio input is limited to 24 MB. Speech outputs MP3.
+    OpenAI plans to shut down the Speech API model on 6 January 2027. Disclose to
+    listeners that speech is AI-generated. Models can make mistakes; review decisions
+    and moderation before relying on them. Timeouts may have incurred a charge: check
+    OpenAI logs before retrying.
+
+    '

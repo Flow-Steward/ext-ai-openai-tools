@@ -1,0 +1,33 @@
+connection_types:
+- connection_type_id: openai_api
+  display_name: OpenAI API
+  description: Project-scoped OpenAI API key.
+  config_schema:
+    type: object
+    additionalProperties: false
+    properties: {}
+  secret_schema:
+    type: object
+    additionalProperties: false
+    required:
+    - api_key
+    properties:
+      api_key:
+        type: string
+        title: OpenAI API key
+        description: Create a project key in the OpenAI API dashboard. Stored encrypted
+          by Flow Steward.
+  capabilities:
+  - predicate
+  - choice
+  - score
+  - moderate_text
+  - moderate_image
+  - generate_image
+  - edit_image
+  - transcribe
+  - speech
+  safety_profile:
+    requires_https: true
+    requires_host_allowlist: false
+    stores_secret_values: false

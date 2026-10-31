@@ -1,0 +1,52 @@
+policies:
+- operation_id: moderate_image
+  inputs:
+  - kind: artifact
+    value_type: artifact_handle
+    binding_key: source_file
+    field: artifact_handle
+    required: true
+    max_size_bytes: 24000000
+  outputs: []
+- operation_id: generate_image
+  inputs: []
+  outputs:
+  - kind: artifact
+    binding_key: output_artifact_handle
+    filename: image.png
+    content_type: image/png
+    max_size_bytes: 26214400
+    retention_class: run_window
+- operation_id: edit_image
+  inputs:
+  - kind: artifact
+    value_type: artifact_handle
+    binding_key: source_file
+    field: artifact_handle
+    required: true
+    max_size_bytes: 24000000
+  outputs:
+  - kind: artifact
+    binding_key: output_artifact_handle
+    filename: image.png
+    content_type: image/png
+    max_size_bytes: 26214400
+    retention_class: run_window
+- operation_id: transcribe
+  inputs:
+  - kind: artifact
+    value_type: artifact_handle
+    binding_key: source_file
+    field: artifact_handle
+    required: true
+    max_size_bytes: 24000000
+  outputs: []
+- operation_id: speech
+  inputs: []
+  outputs:
+  - kind: artifact
+    binding_key: output_artifact_handle
+    filename: speech.mp3
+    content_type: audio/mpeg
+    max_size_bytes: 26214400
+    retention_class: run_window

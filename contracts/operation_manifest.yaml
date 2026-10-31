@@ -1,0 +1,226 @@
+operations:
+- operation_id: predicate
+  display_name: Decide yes or no
+  description: Decide yes or no with OpenAI.
+  operation_kind: action
+  category: ai
+  connection_type_ids:
+  - openai_api
+  inputs:
+  - name: connection_ref
+    value_type: connection_ref
+    required: true
+  - name: prompt
+    value_type: text
+    required: true
+  outputs:
+  - name: value
+    value_type: number
+  - name: request_id
+    value_type: text
+  error_codes: &id001
+  - invalid_payload
+  - invalid_connection
+  - not_configured
+  - authentication_failed
+  - rate_limited
+  - provider_error
+  - outcome_unknown
+  - invalid_response
+  - artifact_access_failed
+  - internal_error
+- operation_id: choice
+  display_name: Choose an option
+  description: Choose an option with OpenAI.
+  operation_kind: action
+  category: ai
+  connection_type_ids:
+  - openai_api
+  inputs:
+  - name: connection_ref
+    value_type: connection_ref
+    required: true
+  - name: prompt
+    value_type: text
+    required: true
+  - name: choices
+    value_type: array
+    required: true
+    schema:
+      type: array
+      minItems: 2
+      maxItems: 20
+      items:
+        type: string
+        minLength: 1
+        maxLength: 100
+  outputs:
+  - name: value
+    value_type: text
+  - name: request_id
+    value_type: text
+  error_codes: *id001
+- operation_id: score
+  display_name: Score ordered levels
+  description: Score ordered levels with OpenAI.
+  operation_kind: action
+  category: ai
+  connection_type_ids:
+  - openai_api
+  inputs:
+  - name: connection_ref
+    value_type: connection_ref
+    required: true
+  - name: prompt
+    value_type: text
+    required: true
+  - name: levels
+    value_type: array
+    required: true
+    schema:
+      type: array
+      minItems: 2
+      maxItems: 20
+      items:
+        type: string
+        minLength: 1
+        maxLength: 100
+  outputs:
+  - name: value
+    value_type: number
+  - name: request_id
+    value_type: text
+  error_codes: *id001
+- operation_id: moderate_text
+  display_name: Moderate text
+  description: Moderate text with OpenAI.
+  operation_kind: action
+  category: ai
+  connection_type_ids:
+  - openai_api
+  inputs:
+  - name: connection_ref
+    value_type: connection_ref
+    required: true
+  - name: text
+    value_type: text
+    required: true
+  outputs:
+  - name: flagged
+    value_type: boolean
+  - name: categories
+    value_type: object
+  - name: request_id
+    value_type: text
+  error_codes: *id001
+- operation_id: moderate_image
+  display_name: Moderate image
+  description: Moderate image with OpenAI.
+  operation_kind: action
+  category: ai
+  connection_type_ids:
+  - openai_api
+  inputs:
+  - name: connection_ref
+    value_type: connection_ref
+    required: true
+  - name: artifact_handle
+    value_type: artifact_handle
+    required: true
+  outputs:
+  - name: flagged
+    value_type: boolean
+  - name: categories
+    value_type: object
+  - name: request_id
+    value_type: text
+  error_codes: *id001
+- operation_id: generate_image
+  display_name: Generate image
+  description: Generate image with OpenAI.
+  operation_kind: action
+  category: ai
+  connection_type_ids:
+  - openai_api
+  inputs:
+  - name: connection_ref
+    value_type: connection_ref
+    required: true
+  - name: prompt
+    value_type: text
+    required: true
+  outputs:
+  - name: output_artifact_handle
+    value_type: artifact_handle
+  - name: request_id
+    value_type: text
+  error_codes: *id001
+- operation_id: edit_image
+  display_name: Edit image
+  description: Edit image with OpenAI.
+  operation_kind: action
+  category: ai
+  connection_type_ids:
+  - openai_api
+  inputs:
+  - name: connection_ref
+    value_type: connection_ref
+    required: true
+  - name: artifact_handle
+    value_type: artifact_handle
+    required: true
+  - name: prompt
+    value_type: text
+    required: true
+  outputs:
+  - name: output_artifact_handle
+    value_type: artifact_handle
+  - name: request_id
+    value_type: text
+  error_codes: *id001
+- operation_id: transcribe
+  display_name: Transcribe audio
+  description: Transcribe audio with OpenAI.
+  operation_kind: action
+  category: ai
+  connection_type_ids:
+  - openai_api
+  inputs:
+  - name: connection_ref
+    value_type: connection_ref
+    required: true
+  - name: artifact_handle
+    value_type: artifact_handle
+    required: true
+  - name: filename
+    value_type: text
+    required: true
+  outputs:
+  - name: text
+    value_type: text
+  - name: request_id
+    value_type: text
+  error_codes: *id001
+- operation_id: speech
+  display_name: Synthesize speech
+  description: Synthesize speech with OpenAI.
+  operation_kind: action
+  category: ai
+  connection_type_ids:
+  - openai_api
+  inputs:
+  - name: connection_ref
+    value_type: connection_ref
+    required: true
+  - name: text
+    value_type: text
+    required: true
+  - name: voice
+    value_type: text
+    required: false
+  outputs:
+  - name: output_artifact_handle
+    value_type: artifact_handle
+  - name: request_id
+    value_type: text
+  error_codes: *id001

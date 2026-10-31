@@ -1,0 +1,207 @@
+actions:
+- action_id: predicate
+  title: Decide yes or no
+  description: Decide yes or no with OpenAI.
+  required_scopes:
+  - extension:invoke
+  - artifact:read
+  - artifact:write
+  handler:
+    mode: extension
+  mutates_platform: false
+  workflow_visible: true
+  parameters:
+  - name: connection_ref
+    type: connection_ref
+    required: true
+  - name: prompt
+    type: string
+    required: true
+  result_fields:
+  - value
+  - request_id
+- action_id: choice
+  title: Choose an option
+  description: Choose an option with OpenAI.
+  required_scopes:
+  - extension:invoke
+  - artifact:read
+  - artifact:write
+  handler:
+    mode: extension
+  mutates_platform: false
+  workflow_visible: true
+  parameters:
+  - name: connection_ref
+    type: connection_ref
+    required: true
+  - name: prompt
+    type: string
+    required: true
+  - name: choices
+    type: array
+    required: true
+  result_fields:
+  - value
+  - request_id
+- action_id: score
+  title: Score ordered levels
+  description: Score ordered levels with OpenAI.
+  required_scopes:
+  - extension:invoke
+  - artifact:read
+  - artifact:write
+  handler:
+    mode: extension
+  mutates_platform: false
+  workflow_visible: true
+  parameters:
+  - name: connection_ref
+    type: connection_ref
+    required: true
+  - name: prompt
+    type: string
+    required: true
+  - name: levels
+    type: array
+    required: true
+  result_fields:
+  - value
+  - request_id
+- action_id: moderate_text
+  title: Moderate text
+  description: Moderate text with OpenAI.
+  required_scopes:
+  - extension:invoke
+  - artifact:read
+  - artifact:write
+  handler:
+    mode: extension
+  mutates_platform: false
+  workflow_visible: true
+  parameters:
+  - name: connection_ref
+    type: connection_ref
+    required: true
+  - name: text
+    type: string
+    required: true
+  result_fields:
+  - flagged
+  - categories
+  - request_id
+- action_id: moderate_image
+  title: Moderate image
+  description: Moderate image with OpenAI.
+  required_scopes:
+  - extension:invoke
+  - artifact:read
+  - artifact:write
+  handler:
+    mode: extension
+  mutates_platform: false
+  workflow_visible: true
+  parameters:
+  - name: connection_ref
+    type: connection_ref
+    required: true
+  - name: artifact_handle
+    type: artifact_handle
+    required: true
+  result_fields:
+  - flagged
+  - categories
+  - request_id
+- action_id: generate_image
+  title: Generate image
+  description: Generate image with OpenAI.
+  required_scopes:
+  - extension:invoke
+  - artifact:read
+  - artifact:write
+  handler:
+    mode: extension
+  mutates_platform: false
+  workflow_visible: true
+  parameters:
+  - name: connection_ref
+    type: connection_ref
+    required: true
+  - name: prompt
+    type: string
+    required: true
+  result_fields:
+  - output_artifact_handle
+  - request_id
+- action_id: edit_image
+  title: Edit image
+  description: Edit image with OpenAI.
+  required_scopes:
+  - extension:invoke
+  - artifact:read
+  - artifact:write
+  handler:
+    mode: extension
+  mutates_platform: false
+  workflow_visible: true
+  parameters:
+  - name: connection_ref
+    type: connection_ref
+    required: true
+  - name: artifact_handle
+    type: artifact_handle
+    required: true
+  - name: prompt
+    type: string
+    required: true
+  result_fields:
+  - output_artifact_handle
+  - request_id
+- action_id: transcribe
+  title: Transcribe audio
+  description: Transcribe audio with OpenAI.
+  required_scopes:
+  - extension:invoke
+  - artifact:read
+  - artifact:write
+  handler:
+    mode: extension
+  mutates_platform: false
+  workflow_visible: true
+  parameters:
+  - name: connection_ref
+    type: connection_ref
+    required: true
+  - name: artifact_handle
+    type: artifact_handle
+    required: true
+  - name: filename
+    type: string
+    required: true
+  result_fields:
+  - text
+  - request_id
+- action_id: speech
+  title: Synthesize speech
+  description: Synthesize speech with OpenAI.
+  required_scopes:
+  - extension:invoke
+  - artifact:read
+  - artifact:write
+  handler:
+    mode: extension
+  mutates_platform: false
+  workflow_visible: true
+  parameters:
+  - name: connection_ref
+    type: connection_ref
+    required: true
+  - name: text
+    type: string
+    required: true
+  - name: voice
+    type: string
+    required: false
+  result_fields:
+  - output_artifact_handle
+  - request_id

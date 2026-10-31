@@ -1,0 +1,121 @@
+forms:
+- operation_id: predicate
+  title: Decide yes or no
+  section: OpenAI Tools
+  fields:
+  - name: prompt
+    widget_type: text
+    label: Instructions
+    required: true
+- operation_id: choice
+  title: Choose an option
+  section: OpenAI Tools
+  fields:
+  - name: prompt
+    widget_type: text
+    label: Instructions
+    required: true
+  - name: choices
+    widget_type: json
+    label: Choices (JSON array)
+    required: true
+    help_text: Enter 2–20 distinct strings, for example ["low", "high"].
+- operation_id: score
+  title: Score ordered levels
+  section: OpenAI Tools
+  fields:
+  - name: prompt
+    widget_type: text
+    label: Instructions
+    required: true
+  - name: levels
+    widget_type: json
+    label: Ordered levels (JSON array)
+    required: true
+    help_text: Enter 2–20 distinct strings, for example ["low", "high"].
+- operation_id: moderate_text
+  title: Moderate text
+  section: OpenAI Tools
+  fields:
+  - name: text
+    widget_type: text
+    label: Text
+    required: true
+- operation_id: moderate_image
+  title: Moderate image
+  section: OpenAI Tools
+  fields:
+  - name: artifact_handle
+    widget_type: artifact_picker
+    label: Input file
+    required: true
+- operation_id: generate_image
+  title: Generate image
+  section: OpenAI Tools
+  fields:
+  - name: prompt
+    widget_type: text
+    label: Instructions
+    required: true
+- operation_id: edit_image
+  title: Edit image
+  section: OpenAI Tools
+  fields:
+  - name: artifact_handle
+    widget_type: artifact_picker
+    label: Input file
+    required: true
+  - name: prompt
+    widget_type: text
+    label: Instructions
+    required: true
+- operation_id: transcribe
+  title: Transcribe audio
+  section: OpenAI Tools
+  fields:
+  - name: artifact_handle
+    widget_type: artifact_picker
+    label: Input file
+    required: true
+  - name: filename
+    widget_type: text
+    label: Audio filename
+    required: true
+    help_text: 'Use the real audio extension: mp3, mp4, mpeg, mpga, m4a, wav or webm.
+      Maximum 24 MB.'
+- operation_id: speech
+  title: Synthesize speech
+  section: OpenAI Tools
+  fields:
+  - name: text
+    widget_type: text
+    label: Text
+    required: true
+  - name: voice
+    widget_type: select
+    label: Voice
+    required: false
+    default: alloy
+    options:
+    - label: Alloy
+      value: alloy
+    - label: Ash
+      value: ash
+    - label: Ballad
+      value: ballad
+    - label: Coral
+      value: coral
+    - label: Echo
+      value: echo
+    - label: Fable
+      value: fable
+    - label: Nova
+      value: nova
+    - label: Onyx
+      value: onyx
+    - label: Sage
+      value: sage
+    - label: Shimmer
+      value: shimmer
+    - label: Verse
+      value: verse

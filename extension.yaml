@@ -1,0 +1,63 @@
+manifest_version: 2
+lifecycle:
+  data_schema_version: 1
+  data_migrations: []
+extension_id: flowsteward.openai-tools
+kind: tool_provider
+version: 1.0.0
+display_name: OpenAI Tools
+description: Decisions, moderation, images and audio using a project OpenAI connection.
+vendor:
+  name: Flow Steward
+listing:
+  category: ai
+  tags:
+  - openai
+  - image
+  - audio
+  - moderation
+  summary: Use OpenAI decisions, moderation, images and audio in workflows.
+features:
+- tool
+- action
+required_scopes:
+- extension:invoke
+- artifact:read
+- artifact:write
+machine_auth:
+  service_account_key: svc_ext_openai_tools
+  required_scopes:
+  - extension:invoke
+  - artifact:read
+  - artifact:write
+account_scope:
+  scope_type: project
+  description: Each project chooses its own OpenAI connection.
+entrypoint:
+  mode: subprocess
+  command:
+  - python3
+  - main.py
+  timeout_seconds: 120
+health:
+  command:
+  - python3
+  - health.py
+  timeout_seconds: 5
+ui_manifest: ui/ui_manifest.yaml
+action_manifest: ui/actions/actions.yaml
+egress:
+  hosts:
+  - api.openai.com
+runtime:
+  contract_version: extension_host_v2
+  extension_contract_v2:
+    connection_types: contracts/connection_types.yaml
+    operation_manifest: contracts/operation_manifest.yaml
+    artifact_policies: contracts/artifact_policies.yaml
+    step_ui_manifest: contracts/step_ui_manifest.yaml
+python_requirements:
+- name: flowsteward-extension-sdk
+  version: 0.4.0
+  hashes:
+  - sha256:ffb5f3764d5a384b4441f6e3c0c4e66f5887d57c156fdc93abf70b5d0eeb22af
