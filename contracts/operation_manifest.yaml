@@ -19,6 +19,7 @@ operations:
   - name: request_id
     value_type: text
   error_codes: &id001
+  - test_mode_suppressed
   - invalid_payload
   - invalid_connection
   - not_configured

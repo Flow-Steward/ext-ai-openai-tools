@@ -16,6 +16,15 @@ import provider
 def handle(payload):
     try:
         runtime_context_from_payload(payload)
+        runtime = payload.get("runtime_context", {})
+        if not isinstance(runtime.get("test_mode", False), bool):
+            raise provider.ProviderError(
+                "invalid_payload", "test_mode must be a boolean."
+            )
+        if runtime.get("test_mode", False):
+            raise provider.ProviderError(
+                "test_mode_suppressed", "OpenAI calls are suppressed in test mode."
+            )
         action = payload.get("action", {})
         args = action.get("input", {})
         connection = action.get("target", {}).get("connection", {})
@@ -77,6 +86,15 @@ def handle(payload):
             "error": str(exc),
             "errors": [{"code": exc.code, "message": str(exc)}],
             "request_id": exc.request_id,
+            "retryable": False,
+            "definitely_no_external_effect": exc.code
+            in {
+                "test_mode_suppressed",
+                "invalid_payload",
+                "invalid_connection",
+                "not_configured",
+            }
+            and not exc.request_id,
         }
     except (ArtifactAccessError, ValueError, KeyError, TypeError):
         return {

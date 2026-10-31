@@ -1,0 +1,89 @@
+workflow_id: demo_openai_moderation
+version: 1.0.0
+display_name: 'Demo: Moderate text with OpenAI'
+description: Send supplied sample text to OpenAI moderation using a project connection.
+  Requires API access and may incur charges.
+enabled: true
+trigger:
+  confidence_threshold: 0.0
+settings:
+  execution_graph:
+    schema_version: 1
+    entry:
+      kind: step
+      id: moderate_text
+    edges:
+    - source:
+        kind: step
+        id: moderate_text
+      outcome:
+        name: success
+      target:
+        kind: step
+        id: done
+      rework: false
+  traits:
+    demo: true
+  policies:
+    branch_strategy: none
+  callable:
+    enabled: true
+    trigger_channels:
+    - ui
+    - api
+    - mcp
+    input_mode: fields
+    strict_inputs: true
+    expected_inputs:
+    - name: text
+      label: Text to review
+      type: paragraph
+      required: true
+      description: Text sent to OpenAI moderation.
+    output_mode: variables
+    expected_outputs:
+    - name: moderation
+      type: object
+      required: false
+      description: Moderation result.
+    expected_artifacts: []
+    side_effects: []
+builder_metadata_jsonb:
+  purpose: Moderate user-supplied text with a selected OpenAI connection.
+  use_cases:
+  - content review
+  anti_use_cases:
+  - automatic final safety decisions
+  composition_role: content_review
+  determinism_level: requires_connection
+  safe_for_auto_use: false
+tags:
+- demo
+- openai
+- moderation
+steps:
+- step_id: moderate_text
+  display_name: Moderate text
+  step_kind: connector
+  connector_id: extension.flowsteward.openai-tools
+  connector_install_id: flowsteward.openai-tools
+  connection_binding_jsonb: {}
+  override:
+    connector:
+      extension_id: flowsteward.openai-tools
+      operation_id: moderate_text
+      action_id: moderate_text
+  input_mapping_jsonb:
+    text: state.inputs.text
+  output_mapping_jsonb:
+    result: state.moderation
+  boundary_contract:
+    exit:
+    - moderation
+- step_id: done
+  display_name: Finish moderation
+  step_kind: stop_success
+  override:
+    stop_success:
+      message: Moderation completed.
+groups: []

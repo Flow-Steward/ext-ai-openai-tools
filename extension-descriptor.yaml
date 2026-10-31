@@ -33,6 +33,10 @@ artifacts:
   - extension_id: flowsteward.openai-tools
     ref: extension.yaml
     publish: true
+  workflows:
+  - workflow_id: demo_openai_moderation
+    ref: artifacts/workflows/demo_openai_moderation.yaml
+    publish: true
 provenance:
   origin: user_generated
 commerce:

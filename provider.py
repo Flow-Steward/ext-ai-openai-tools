@@ -55,7 +55,7 @@ def request_bytes(path, body, key, content_type="application/json"):
             else "rate_limited"
             if exc.code == 429
             else "outcome_unknown"
-            if exc.code >= 500
+            if exc.code == 408 or exc.code >= 500
             else "provider_error"
         )
         raise ProviderError(

@@ -9,3 +9,5 @@ API references: https://developers.openai.com/api/reference/resources/images, ht
 ## Example workflow
 
 Create a workflow with an Extension tools step, select **Moderate text** and your OpenAI API connection, and map its required Text input from a workflow variable. Map `result.flagged` to a workflow variable and route it through an If step for review. This sends the supplied text to OpenAI; use sample content when testing.
+
+An importable example is included at `artifacts/workflows/demo_openai_moderation.yaml`. Assign an OpenAI API connection before running it. The example is not deterministic and sends text to OpenAI.
