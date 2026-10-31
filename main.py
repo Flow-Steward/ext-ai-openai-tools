@@ -4,8 +4,8 @@ import hashlib
 import json
 import sys
 
-from flowsteward_extension_sdk import runtime_context_from_payload
-from flowsteward_extension_sdk.artifacts import (
+from flowsteward_extension_sdk import runtime_context_from_payload  # type: ignore[import-untyped]
+from flowsteward_extension_sdk.artifacts import (  # type: ignore[import-untyped]
     ArtifactAccessError,
     stream_artifact_bytes,
     write_artifact_bytes,
