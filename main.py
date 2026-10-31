@@ -98,14 +98,25 @@ def handle(payload):
             "provider_message_id": result.get("request_id", ""),
         }
     except provider.ProviderError as exc:
+        message = str(exc)
+        if exc.http_status is not None:
+            details = [f"HTTP {exc.http_status}"]
+            if exc.upstream_code:
+                details.append(f"code {exc.upstream_code}")
+            if exc.upstream_param:
+                details.append(f"parameter {exc.upstream_param}")
+            message += " (" + ", ".join(details) + ")"
         return {
             "ok": False,
             "result": {},
             "error_code": exc.code,
-            "error": str(exc),
-            "errors": [{"code": exc.code, "message": str(exc)}],
+            "error": message,
+            "errors": [{"code": exc.code, "message": message}],
             "request_id": exc.request_id,
             "provider_message_id": exc.request_id,
+            "provider_http_status": exc.http_status,
+            "provider_code": exc.upstream_code,
+            "provider_param": exc.upstream_param,
             "retryable": False,
             "definitely_no_external_effect": exc.code
             in {

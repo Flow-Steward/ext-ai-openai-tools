@@ -6,7 +6,7 @@ policies:
     binding_key: source_file
     field: artifact_handle
     required: true
-    max_size_bytes: 24000000
+    max_size_bytes: 15000000
   outputs: []
 - operation_id: generate_image
   inputs: []
@@ -24,7 +24,7 @@ policies:
     binding_key: source_file
     field: artifact_handle
     required: true
-    max_size_bytes: 24000000
+    max_size_bytes: 15000000
   outputs:
   - kind: artifact
     binding_key: output_artifact_handle

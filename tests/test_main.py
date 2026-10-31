@@ -151,3 +151,73 @@ def test_host_connection_target_envelope_reaches_provider():
         response = main.handle(payload)
     assert response["ok"] is True
     assert perform.call_args.args[2] == "secret"
+
+
+def test_http_failure_exposes_safe_metadata_in_effect_error():
+    payload = {
+        "runtime_context": {"external_effect_id": "effect-1"},
+        "action": {
+            "action_id": "edit_image",
+            "input": {
+                "connection_ref": "conn",
+                "prompt": "edit",
+                "artifact_handle": "a",
+            },
+            "target": {
+                "connection": {
+                    "connection_id": "conn",
+                    "connection_type": "openai_api",
+                    "secrets": {"api_key": "secret"},
+                }
+            },
+        },
+    }
+    failure = main.provider.ProviderError(
+        "outcome_unknown",
+        "Outcome unknown.",
+        "req_safe",
+        http_status=502,
+        upstream_code="server_error",
+        upstream_param="image",
+    )
+    with (
+        patch.object(main, "runtime_context_from_payload"),
+        patch.object(main.provider, "perform", side_effect=failure),
+    ):
+        response = main.handle(payload)
+    assert response["provider_message_id"] == "req_safe"
+    assert response["provider_http_status"] == 502
+    assert "HTTP 502" in response["error"]
+    assert "server_error" in response["error"]
+    assert "image" in response["error"]
+    assert response["retryable"] is False
+
+
+def test_unsupported_image_returns_definitive_no_effect():
+    payload = {
+        "runtime_context": {"external_effect_id": "effect-1"},
+        "action": {
+            "action_id": "edit_image",
+            "input": {
+                "connection_ref": "conn",
+                "prompt": "edit",
+                "artifact_handle": "a",
+            },
+            "target": {
+                "connection": {
+                    "connection_id": "conn",
+                    "connection_type": "openai_api",
+                    "secrets": {"api_key": "secret"},
+                }
+            },
+        },
+    }
+    with (
+        patch.object(main, "runtime_context_from_payload"),
+        patch.object(main, "stream_artifact_bytes", return_value=iter([b"%PDF-1.7"])),
+        patch.object(main.provider, "request_json") as send,
+    ):
+        response = main.handle(payload)
+    assert response["error_code"] == "invalid_payload"
+    assert response["definitely_no_external_effect"] is True
+    send.assert_not_called()

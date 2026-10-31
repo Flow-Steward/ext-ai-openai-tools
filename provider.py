@@ -3,6 +3,7 @@
 import base64
 from contextvars import ContextVar
 import json
+import http.client
 import socket
 import urllib.error
 import urllib.request
@@ -11,19 +12,73 @@ import uuid
 CLIENT_REQUEST_ID = ContextVar("client_request_id", default="")
 
 MAX_INPUT = 24_000_000
+MAX_IMAGE_INPUT = 15_000_000
 MAX_OUTPUT = 25 * 1024 * 1024
 
 
 class ProviderError(Exception):
-    def __init__(self, code, message, request_id=""):
+    def __init__(
+        self,
+        code,
+        message,
+        request_id="",
+        *,
+        http_status=None,
+        upstream_code="",
+        upstream_param="",
+    ):
         super().__init__(message)
         self.code = code
         self.request_id = request_id
+        self.http_status = http_status
+        self.upstream_code = upstream_code
+        self.upstream_param = upstream_param
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
+
+
+def safe_error_details(error):
+    """Extract only known diagnostic tokens; never expose the provider message."""
+    codes = {
+        "server_error",
+        "invalid_request_error",
+        "invalid_api_key",
+        "model_not_found",
+        "rate_limit_exceeded",
+        "insufficient_quota",
+        "content_policy_violation",
+    }
+    params = {
+        "image",
+        "image[]",
+        "images",
+        "images[0].image_url",
+        "prompt",
+        "model",
+        "size",
+        "quality",
+        "file",
+        "voice",
+        "input",
+    }
+    try:
+        raw = error.read(8193)
+        if len(raw) > 8192:
+            return "", ""
+        payload = json.loads(raw)
+        details = payload.get("error", {}) if isinstance(payload, dict) else {}
+        if not isinstance(details, dict):
+            return "", ""
+        code, param = details.get("code"), details.get("param")
+        return (
+            code if isinstance(code, str) and code in codes else "",
+            param if isinstance(param, str) and param in params else "",
+        )
+    except (OSError, TypeError, ValueError, RecursionError, http.client.HTTPException):
+        return "", ""
 
 
 def request_bytes(path, body, key, content_type="application/json"):
@@ -52,6 +107,7 @@ def request_bytes(path, body, key, content_type="application/json"):
                 )
             return data, request_id
     except urllib.error.HTTPError as exc:
+        upstream_code, upstream_param = safe_error_details(exc)
         code = (
             "authentication_failed"
             if exc.code in (401, 403)
@@ -69,6 +125,9 @@ def request_bytes(path, body, key, content_type="application/json"):
                 else "OpenAI rejected the request; check the connection, model access and limits."
             ),
             exc.headers.get("x-request-id", "") or client_request_id,
+            http_status=exc.code,
+            upstream_code=upstream_code,
+            upstream_param=upstream_param,
         ) from None
     except (urllib.error.URLError, socket.timeout, TimeoutError, OSError):
         raise ProviderError(
@@ -100,6 +159,24 @@ def text(value, field, maximum=16000):
             f"{field} must be nonempty text, at most {maximum} characters.",
         )
     return value
+
+
+def image_data_url(data):
+    if len(data) > MAX_IMAGE_INPUT:
+        raise ProviderError(
+            "invalid_payload", "Input image exceeds 15 MB (15,000,000 bytes)."
+        )
+    if data.startswith(b"\x89PNG\r\n\x1a\n"):
+        mime = "image/png"
+    elif data.startswith(b"\xff\xd8\xff"):
+        mime = "image/jpeg"
+    elif len(data) >= 12 and data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        mime = "image/webp"
+    else:
+        raise ProviderError(
+            "invalid_payload", "Input image must be PNG, JPEG, or WebP."
+        )
+    return "data:" + mime + ";base64," + base64.b64encode(data).decode("ascii")
 
 
 def multipart(fields, filename, content):
@@ -204,10 +281,7 @@ def perform(operation, args, key, io):
             content = [
                 {
                     "type": "image_url",
-                    "image_url": {
-                        "url": "data:image/png;base64,"
-                        + base64.b64encode(data).decode()
-                    },
+                    "image_url": {"url": image_data_url(data)},
                 }
             ]
         response, rid = request_json(
@@ -252,18 +326,19 @@ def perform(operation, args, key, io):
     if operation == "edit_image":
         image = io["read"](args.get("artifact_handle"))
         prompt = text(args.get("prompt"), "prompt", 32000)
-        body, content_type = multipart(
-            {"model": "gpt-image-2.5-sunburst", "prompt": prompt, "size": "1024x1024"},
-            "image.png",
-            image,
+        response, rid = request_json(
+            "/images/edits",
+            {
+                "model": "gpt-image-2.5-sunburst",
+                "prompt": prompt,
+                "size": "1024x1024",
+                "n": 1,
+                "images": [{"image_url": image_data_url(image)}],
+            },
+            key,
         )
-        # Images edits expects the multipart field name "image".
-        body = body.replace(b'name="file";', b'name="image";', 1)
-        raw, rid = request_bytes("/images/edits", body, key, content_type)
         try:
-            data = base64.b64decode(
-                json.loads(raw)["data"][0]["b64_json"], validate=True
-            )
+            data = base64.b64decode(response["data"][0]["b64_json"], validate=True)
         except (KeyError, IndexError, TypeError, ValueError):
             raise ProviderError(
                 "invalid_response", "OpenAI returned an invalid image.", rid

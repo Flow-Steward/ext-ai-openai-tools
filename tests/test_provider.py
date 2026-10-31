@@ -98,21 +98,6 @@ def test_generate_image_writes_decoded_artifact():
     assert result == {"output_artifact_handle": "a", "request_id": "r"}
 
 
-def test_image_edit_uses_image_multipart_field():
-    response = b'{"data":[{"b64_json":"aW1hZ2U="}]}'
-    with patch.object(
-        provider, "request_bytes", return_value=(response, "r")
-    ) as request:
-        provider.perform(
-            "edit_image",
-            {"prompt": "Edit", "artifact_handle": "in"},
-            "secret",
-            {"read": lambda _: b"png", "write": lambda *_: "out"},
-        )
-    assert b'name="image";' in request.call_args.args[1]
-    assert request.call_args.args[0] == "/images/edits"
-
-
 def test_transcription_requires_supported_extension():
     with pytest.raises(provider.ProviderError, match="filename"):
         provider.perform(
@@ -142,11 +127,11 @@ def test_moderate_image_uses_data_url():
             "moderate_image",
             {"artifact_handle": "a"},
             "secret",
-            {"read": lambda _: b"png"},
+            {"read": lambda _: b"\x89PNG\r\n\x1a\n"},
         )
     assert (
         request.call_args.args[1]["input"][0]["image_url"]["url"]
-        == "data:image/png;base64,cG5n"
+        == "data:image/png;base64,iVBORw0KGgo="
     )
 
 
@@ -246,3 +231,202 @@ def test_multibyte_transcript_over_replay_budget_fails_without_truncation():
             )
     assert error.value.request_id == "req_long"
     assert error.value.code == "invalid_response"
+
+
+def test_http_error_preserves_safe_structured_diagnostics_without_echoing_body():
+    import io
+    from urllib.error import HTTPError
+
+    body = (
+        b'{"error":{"code":"server_error","param":"image","message":"secret echoed"}}'
+    )
+    error = HTTPError(
+        "https://api.openai.com/v1/images/edits",
+        502,
+        "failure",
+        {"x-request-id": "req_safe"},
+        io.BytesIO(body),
+    )
+    with patch("urllib.request.OpenerDirector.open", side_effect=error) as send:
+        with pytest.raises(provider.ProviderError) as result:
+            provider.request_bytes("/images/edits", b"request", "secret")
+    assert send.call_count == 1
+    assert result.value.code == "outcome_unknown"
+    assert result.value.request_id == "req_safe"
+    assert result.value.http_status == 502
+    assert result.value.upstream_code == "server_error"
+    assert result.value.upstream_param == "image"
+    assert "secret echoed" not in str(result.value)
+
+
+def test_http_error_rejects_untrusted_diagnostic_values():
+    import io
+    from urllib.error import HTTPError
+
+    body = (
+        b'{"error":{"code":"secret_key","param":"secret_key","message":"secret_key"}}'
+    )
+    error = HTTPError(
+        "https://api.openai.com/v1/images/edits", 400, "failure", {}, io.BytesIO(body)
+    )
+    with patch("urllib.request.OpenerDirector.open", side_effect=error):
+        with pytest.raises(provider.ProviderError) as result:
+            provider.request_bytes("/images/edits", b"request", "secret_key")
+    assert result.value.http_status == 400
+    assert result.value.upstream_code == ""
+    assert result.value.upstream_param == ""
+    assert "secret_key" not in str(result.value)
+
+
+def test_unparseable_or_large_error_body_is_discarded():
+    import io
+    from urllib.error import HTTPError
+
+    for body in (b"not json", b"x" * 9000):
+        error = HTTPError(
+            "https://api.openai.com/v1/test", 502, "failure", {}, io.BytesIO(body)
+        )
+        with patch("urllib.request.OpenerDirector.open", side_effect=error):
+            with pytest.raises(provider.ProviderError) as result:
+                provider.request_bytes("/test", b"request", "secret")
+        assert result.value.http_status == 502
+        assert result.value.upstream_code == ""
+        assert result.value.upstream_param == ""
+
+
+def test_edit_image_serializes_documented_json_data_url_and_png_bytes():
+    import base64
+    from email.message import Message
+    from io import BytesIO
+
+    image_bytes = b"\x89PNG\r\n\x1a\nsynthetic"
+    response = BytesIO(b'{"data":[{"b64_json":"aW1hZ2U="}]}')
+    response.headers = Message()
+    response.headers["x-request-id"] = "req_edit"
+    with patch("urllib.request.OpenerDirector.open", return_value=response) as send:
+        result = provider.perform(
+            "edit_image",
+            {"prompt": "Make it green", "artifact_handle": "a"},
+            "secret",
+            {"read": lambda _: image_bytes, "write": lambda *_: "out"},
+        )
+    request = send.call_args.args[0]
+    assert request.full_url == "https://api.openai.com/v1/images/edits"
+    assert request.get_header("Content-type") == "application/json"
+    body = json.loads(request.data)
+    assert body["model"] == "gpt-image-2.5-sunburst"
+    assert body["n"] == 1 and body["size"] == "1024x1024"
+    assert body["prompt"] == "Make it green"
+    prefix, encoded = body["images"][0]["image_url"].split(",", 1)
+    assert prefix == "data:image/png;base64"
+    assert base64.b64decode(encoded, validate=True) == image_bytes
+    assert result["request_id"] == "req_edit"
+
+
+def test_moderate_image_uses_jpeg_media_type():
+    jpeg = b"\xff\xd8\xffsynthetic"
+    with patch.object(
+        provider,
+        "request_json",
+        return_value=({"results": [{"flagged": False, "categories": {}}]}, "r"),
+    ) as send:
+        provider.perform(
+            "moderate_image",
+            {"artifact_handle": "a"},
+            "secret",
+            {"read": lambda _: jpeg},
+        )
+    assert send.call_args.args[1]["input"][0]["image_url"]["url"].startswith(
+        "data:image/jpeg;base64,"
+    )
+
+
+@pytest.mark.parametrize("operation", ["moderate_image", "edit_image"])
+def test_image_operations_reject_unsupported_artifact_before_request(operation):
+    with patch.object(provider, "request_json") as send:
+        with pytest.raises(provider.ProviderError) as result:
+            provider.perform(
+                operation,
+                {"artifact_handle": "a", "prompt": "edit"},
+                "secret",
+                {"read": lambda _: b"%PDF-1.7"},
+            )
+    assert result.value.code == "invalid_payload"
+    assert not result.value.request_id
+    send.assert_not_called()
+
+
+def test_webp_data_url_uses_image_webp():
+    import base64
+
+    data = b"RIFF\x04\x00\x00\x00WEBPsynthetic"
+    result = provider.image_data_url(data)
+    assert result.startswith("data:image/webp;base64,")
+    assert base64.b64decode(result.split(",", 1)[1]) == data
+
+
+@pytest.mark.parametrize("operation", ["moderate_image", "edit_image"])
+def test_oversized_image_is_rejected_before_upstream_request(operation):
+    data = b"\x89PNG\r\n\x1a\n" + b"x" * (15_000_001 - 8)
+    with patch.object(provider, "request_json") as send:
+        with pytest.raises(provider.ProviderError) as error:
+            provider.perform(
+                operation,
+                {"artifact_handle": "a", "prompt": "edit"},
+                "secret",
+                {"read": lambda _: data},
+            )
+    assert error.value.code == "invalid_payload"
+    assert "15 MB" in str(error.value)
+    send.assert_not_called()
+
+
+def test_image_byte_limit_fits_documented_data_url_length():
+    limit = provider.MAX_IMAGE_INPUT
+    longest_prefix = len("data:image/jpeg;base64,")
+    assert longest_prefix + 4 * ((limit + 2) // 3) <= 20_971_520
+
+
+def test_diagnostic_parse_failures_preserve_status_and_request_id():
+    import http.client
+    import io
+    from urllib.error import HTTPError
+
+    class BrokenRead:
+        def read(self, _amount):
+            raise http.client.IncompleteRead(b"partial")
+
+        def close(self):
+            pass
+
+    for stream in (BrokenRead(), io.BytesIO(b"[" * 1500 + b"]" * 1500)):
+        failure = HTTPError(
+            "https://api.openai.com/v1/images/edits",
+            502,
+            "failure",
+            {"x-request-id": "req_safe"},
+            stream,
+        )
+        with patch("urllib.request.OpenerDirector.open", side_effect=failure):
+            with pytest.raises(provider.ProviderError) as result:
+                provider.request_bytes("/images/edits", b"request", "secret")
+        assert result.value.code == "outcome_unknown"
+        assert result.value.http_status == 502
+        assert result.value.request_id == "req_safe"
+
+
+def test_known_nested_image_parameter_is_safe_diagnostic():
+    import io
+    from urllib.error import HTTPError
+
+    failure = HTTPError(
+        "https://api.openai.com/v1/images/edits",
+        400,
+        "failure",
+        {},
+        io.BytesIO(b'{"error":{"param":"images[0].image_url"}}'),
+    )
+    with patch("urllib.request.OpenerDirector.open", side_effect=failure):
+        with pytest.raises(provider.ProviderError) as result:
+            provider.request_bytes("/images/edits", b"request", "secret")
+    assert result.value.upstream_param == "images[0].image_url"
