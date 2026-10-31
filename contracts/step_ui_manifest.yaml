@@ -4,25 +4,29 @@ forms:
   section: OpenAI Tools
   fields:
   - name: prompt
-    widget_type: text
+    widget_type: textarea
     label: Instructions
     required: true
+    help_text: Describe the question or image to create. Maximum 16,000 characters.
   - name: evidence
-    widget_type: text
+    widget_type: textarea
     label: Evidence
     required: true
+    help_text: Provide the material the question should evaluate. Maximum 16,000 characters.
 - operation_id: choice
   title: Choose an option
   section: OpenAI Tools
   fields:
   - name: prompt
-    widget_type: text
+    widget_type: textarea
     label: Instructions
     required: true
+    help_text: Describe the question or image to create. Maximum 16,000 characters.
   - name: evidence
-    widget_type: text
+    widget_type: textarea
     label: Evidence
     required: true
+    help_text: Provide the material the question should evaluate. Maximum 16,000 characters.
   - name: choices
     widget_type: json
     label: Choices (JSON array)
@@ -33,13 +37,15 @@ forms:
   section: OpenAI Tools
   fields:
   - name: prompt
-    widget_type: text
+    widget_type: textarea
     label: Instructions
     required: true
+    help_text: Describe the question or image to create. Maximum 16,000 characters.
   - name: evidence
-    widget_type: text
+    widget_type: textarea
     label: Evidence
     required: true
+    help_text: Provide the material the question should evaluate. Maximum 16,000 characters.
   - name: levels
     widget_type: json
     label: Ordered levels (JSON array)
@@ -50,9 +56,10 @@ forms:
   section: OpenAI Tools
   fields:
   - name: text
-    widget_type: text
+    widget_type: textarea
     label: Text
     required: true
+    help_text: Enter the content to process. Maximum 16,000 characters.
 - operation_id: moderate_image
   title: Moderate image
   section: OpenAI Tools
@@ -66,9 +73,10 @@ forms:
   section: OpenAI Tools
   fields:
   - name: prompt
-    widget_type: text
+    widget_type: textarea
     label: Instructions
     required: true
+    help_text: Describe the question or image to create. Maximum 32,000 characters.
 - operation_id: edit_image
   title: Edit image
   section: OpenAI Tools
@@ -78,9 +86,10 @@ forms:
     label: Input file
     required: true
   - name: prompt
-    widget_type: text
+    widget_type: textarea
     label: Instructions
     required: true
+    help_text: Describe the question or image to create. Maximum 32,000 characters.
 - operation_id: transcribe
   title: Transcribe audio
   section: OpenAI Tools
@@ -100,9 +109,10 @@ forms:
   section: OpenAI Tools
   fields:
   - name: text
-    widget_type: text
+    widget_type: textarea
     label: Text
     required: true
+    help_text: Enter the content to process. Maximum 4,096 characters.
   - name: voice
     widget_type: select
     label: Voice

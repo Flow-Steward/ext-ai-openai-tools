@@ -13,9 +13,17 @@ operations:
   - name: prompt
     value_type: text
     required: true
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 16000
   - name: evidence
     value_type: text
     required: true
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 16000
   outputs:
   - name: value
     value_type: number
@@ -48,9 +56,17 @@ operations:
   - name: prompt
     value_type: text
     required: true
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 16000
   - name: evidence
     value_type: text
     required: true
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 16000
   - name: choices
     value_type: array
     required: true
@@ -82,9 +98,17 @@ operations:
   - name: prompt
     value_type: text
     required: true
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 16000
   - name: evidence
     value_type: text
     required: true
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 16000
   - name: levels
     value_type: array
     required: true
@@ -116,6 +140,10 @@ operations:
   - name: text
     value_type: text
     required: true
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 16000
   outputs:
   - name: flagged
     value_type: boolean
@@ -160,6 +188,10 @@ operations:
   - name: prompt
     value_type: text
     required: true
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 32000
   outputs:
   - name: output_artifact_handle
     value_type: artifact_handle
@@ -183,6 +215,10 @@ operations:
   - name: prompt
     value_type: text
     required: true
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 32000
   outputs:
   - name: output_artifact_handle
     value_type: artifact_handle
@@ -226,6 +262,10 @@ operations:
   - name: text
     value_type: text
     required: true
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 4096
   - name: voice
     value_type: text
     required: false

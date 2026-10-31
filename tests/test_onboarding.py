@@ -20,3 +20,21 @@ def test_connection_page_has_required_encrypted_api_key_form():
         for field in component["fields"]
     )
     assert "test_action" not in component["data"]
+
+
+def test_long_form_workflow_content_uses_textareas():
+    root = Path(__file__).resolve().parents[1]
+    forms = yaml.safe_load((root / "contracts/step_ui_manifest.yaml").read_text())[
+        "forms"
+    ]
+    long_fields = [
+        (form["operation_id"], field)
+        for form in forms
+        for field in form["fields"]
+        if field["name"] in ("prompt", "evidence", "text")
+    ]
+    assert long_fields
+    assert all(
+        field["widget_type"] == "textarea" and field.get("help_text")
+        for _, field in long_fields
+    )
