@@ -61,3 +61,49 @@ python_requirements:
   version: 0.4.0
   hashes:
   - sha256:ffb5f3764d5a384b4441f6e3c0c4e66f5887d57c156fdc93abf70b5d0eeb22af
+external_effects:
+- operation_id: predicate
+  effect_kind: paid_api_call
+  channel: openai
+  idempotency: required
+  test_mode_behavior: suppress
+- operation_id: choice
+  effect_kind: paid_api_call
+  channel: openai
+  idempotency: required
+  test_mode_behavior: suppress
+- operation_id: score
+  effect_kind: paid_api_call
+  channel: openai
+  idempotency: required
+  test_mode_behavior: suppress
+- operation_id: moderate_text
+  effect_kind: paid_api_call
+  channel: openai
+  idempotency: required
+  test_mode_behavior: suppress
+- operation_id: moderate_image
+  effect_kind: paid_api_call
+  channel: openai
+  idempotency: required
+  test_mode_behavior: suppress
+- operation_id: generate_image
+  effect_kind: paid_api_call
+  channel: openai
+  idempotency: required
+  test_mode_behavior: suppress
+- operation_id: edit_image
+  effect_kind: paid_api_call
+  channel: openai
+  idempotency: required
+  test_mode_behavior: suppress
+- operation_id: transcribe
+  effect_kind: paid_api_call
+  channel: openai
+  idempotency: required
+  test_mode_behavior: suppress
+- operation_id: speech
+  effect_kind: paid_api_call
+  channel: openai
+  idempotency: required
+  test_mode_behavior: suppress

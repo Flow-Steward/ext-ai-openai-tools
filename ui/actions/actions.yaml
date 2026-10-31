@@ -17,6 +17,9 @@ actions:
   - name: prompt
     type: string
     required: true
+  - name: evidence
+    type: string
+    required: true
   result_fields:
   - value
   - request_id
@@ -36,6 +39,9 @@ actions:
     type: connection_ref
     required: true
   - name: prompt
+    type: string
+    required: true
+  - name: evidence
     type: string
     required: true
   - name: choices
@@ -60,6 +66,9 @@ actions:
     type: connection_ref
     required: true
   - name: prompt
+    type: string
+    required: true
+  - name: evidence
     type: string
     required: true
   - name: levels

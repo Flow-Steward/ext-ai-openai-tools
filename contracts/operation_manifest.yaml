@@ -13,12 +13,16 @@ operations:
   - name: prompt
     value_type: text
     required: true
+  - name: evidence
+    value_type: text
+    required: true
   outputs:
   - name: value
     value_type: number
   - name: request_id
     value_type: text
   error_codes: &id001
+  - effect_claim_required
   - test_mode_suppressed
   - invalid_payload
   - invalid_connection
@@ -42,6 +46,9 @@ operations:
     value_type: connection_ref
     required: true
   - name: prompt
+    value_type: text
+    required: true
+  - name: evidence
     value_type: text
     required: true
   - name: choices
@@ -73,6 +80,9 @@ operations:
     value_type: connection_ref
     required: true
   - name: prompt
+    value_type: text
+    required: true
+  - name: evidence
     value_type: text
     required: true
   - name: levels

@@ -1,5 +1,6 @@
 """Flow Steward subprocess entrypoint for project-scoped OpenAI tools."""
 
+import hashlib
 import json
 import sys
 
@@ -25,6 +26,19 @@ def handle(payload):
             raise provider.ProviderError(
                 "test_mode_suppressed", "OpenAI calls are suppressed in test mode."
             )
+        effect_id = runtime.get("external_effect_id")
+        if (
+            not isinstance(effect_id, str)
+            or not effect_id.strip()
+            or len(effect_id) > 512
+        ):
+            raise provider.ProviderError(
+                "effect_claim_required",
+                "A durable effect claim is required before calling OpenAI.",
+            )
+        provider.CLIENT_REQUEST_ID.set(
+            "fs-" + hashlib.sha256(effect_id.encode()).hexdigest()
+        )
         action = payload.get("action", {})
         args = action.get("input", {})
         connection = action.get("target", {}).get("connection", {})
@@ -90,6 +104,7 @@ def handle(payload):
             "definitely_no_external_effect": exc.code
             in {
                 "test_mode_suppressed",
+                "effect_claim_required",
                 "invalid_payload",
                 "invalid_connection",
                 "not_configured",

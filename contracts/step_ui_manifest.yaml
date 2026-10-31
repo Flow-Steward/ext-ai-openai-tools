@@ -7,6 +7,10 @@ forms:
     widget_type: text
     label: Instructions
     required: true
+  - name: evidence
+    widget_type: text
+    label: Evidence
+    required: true
 - operation_id: choice
   title: Choose an option
   section: OpenAI Tools
@@ -14,6 +18,10 @@ forms:
   - name: prompt
     widget_type: text
     label: Instructions
+    required: true
+  - name: evidence
+    widget_type: text
+    label: Evidence
     required: true
   - name: choices
     widget_type: json
@@ -27,6 +35,10 @@ forms:
   - name: prompt
     widget_type: text
     label: Instructions
+    required: true
+  - name: evidence
+    widget_type: text
+    label: Evidence
     required: true
   - name: levels
     widget_type: json

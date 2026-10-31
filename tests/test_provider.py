@@ -13,7 +13,10 @@ def test_decision_schema_and_result():
         provider, "request_json", return_value=(response, "req_123")
     ) as request:
         result = provider.perform(
-            "predicate", {"prompt": "Is it urgent?"}, "secret", {}
+            "predicate",
+            {"prompt": "Is it urgent?", "evidence": "A ticket"},
+            "secret",
+            {},
         )
     assert result == {"value": 0.9, "request_id": "req_123"}
     assert request.call_args.args[0] == "/decisions"
@@ -25,7 +28,10 @@ def test_choice_rejects_value_outside_requested_options():
     with patch.object(provider, "request_json", return_value=(response, "r")):
         with pytest.raises(provider.ProviderError, match="choice"):
             provider.perform(
-                "choice", {"prompt": "Pick", "choices": ["a", "b"]}, "secret", {}
+                "choice",
+                {"prompt": "Pick", "evidence": "A ticket", "choices": ["a", "b"]},
+                "secret",
+                {},
             )
 
 
@@ -56,7 +62,7 @@ def test_no_retry_after_timeout():
 def test_reject_missing_key_before_request():
     with patch.object(provider, "request_json") as send:
         with pytest.raises(provider.ProviderError, match="API key"):
-            provider.perform("predicate", {"prompt": "x"}, "", {})
+            provider.perform("predicate", {"prompt": "x", "evidence": "y"}, "", {})
     send.assert_not_called()
 
 
@@ -66,7 +72,11 @@ def test_score_rejects_out_of_range():
         with pytest.raises(provider.ProviderError, match="score"):
             provider.perform(
                 "score",
-                {"prompt": "Rate quality", "levels": ["low", "high"]},
+                {
+                    "prompt": "Rate quality",
+                    "evidence": "A ticket",
+                    "levels": ["low", "high"],
+                },
                 "secret",
                 {},
             )
@@ -197,3 +207,26 @@ def test_authentication_error_is_safe():
     assert result.value.code == "authentication_failed"
     assert result.value.request_id == "req_auth"
     assert "secret" not in str(result.value)
+
+
+def test_decision_keeps_evidence_separate_from_instructions():
+    response = {
+        "answers": [{"type": "predicate", "name": "decision", "probability": 0.5}]
+    }
+    with patch.object(
+        provider, "request_json", return_value=(response, "r")
+    ) as request:
+        provider.perform(
+            "predicate",
+            {
+                "prompt": "Does it request a refund?",
+                "evidence": "Please refund my order.",
+            },
+            "secret",
+            {},
+        )
+    assert request.call_args.args[1]["input"] == "Please refund my order."
+    assert (
+        request.call_args.args[1]["questions"][0]["instructions"]
+        == "Does it request a refund?"
+    )

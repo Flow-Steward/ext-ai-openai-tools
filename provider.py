@@ -1,11 +1,14 @@
 """Bounded OpenAI API operations; no implicit retries or ambient credentials."""
 
 import base64
+from contextvars import ContextVar
 import json
 import socket
 import urllib.error
 import urllib.request
 import uuid
+
+CLIENT_REQUEST_ID = ContextVar("client_request_id", default="")
 
 MAX_INPUT = 24_000_000
 MAX_OUTPUT = 25 * 1024 * 1024
@@ -24,7 +27,7 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 def request_bytes(path, body, key, content_type="application/json"):
-    client_request_id = str(uuid.uuid4())
+    client_request_id = CLIENT_REQUEST_ID.get() or str(uuid.uuid4())
     request = urllib.request.Request(
         "https://api.openai.com/v1" + path,
         data=body,
@@ -132,6 +135,7 @@ def perform(operation, args, key, io):
         )
     if operation in ("predicate", "choice", "score"):
         prompt = text(args.get("prompt"), "prompt")
+        evidence = text(args.get("evidence"), "evidence")
         question = {"type": operation, "name": "decision", "instructions": prompt}
         if operation in ("choice", "score"):
             values = args.get("choices" if operation == "choice" else "levels")
@@ -158,7 +162,7 @@ def perform(operation, args, key, io):
             ]
         response, rid = request_json(
             "/decisions",
-            {"model": "gpt-6-luna", "input": prompt, "questions": [question]},
+            {"model": "gpt-6-luna", "input": evidence, "questions": [question]},
             key,
         )
         try:
