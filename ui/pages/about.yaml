@@ -17,8 +17,9 @@ components:
     1. Create an OpenAI API project and API key at https://platform.openai.com/api-keys.
     Ensure the project has access to the selected models and billing where required.
 
-    2. In your Flow Steward project, create an OpenAI API connection and save its
-    key in the encrypted API key field.
+    2. Open this extension’s Connection page, choose your Flow Steward project, enter
+    a display name and your API key, then save. Flow Steward stores the key encrypted
+    for that project.
 
     3. Add an OpenAI Tools operation to a workflow and select that connection. Supply
     the required inputs and run.

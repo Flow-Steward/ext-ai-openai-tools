@@ -1,6 +1,6 @@
 # OpenAI Tools
 
-A project-scoped Flow Steward extension providing Decisions API, moderation, image generation and editing, transcription and speech. Create a project API key in the OpenAI API dashboard, save it in an OpenAI API connection, then select that connection in an Extension tools workflow step. Model access and billing are managed in OpenAI. Requests send input to OpenAI and may be charged; review data handling and model output before use. Speech must be disclosed as AI-generated. OpenAI has announced shutdown of the non-realtime speech model on 6 January 2027.
+A project-scoped Flow Steward extension providing Decisions API, moderation, image generation and editing, transcription and speech. Create a project API key in the OpenAI API dashboard, open this extension’s Connection page and save it in a project-scoped OpenAI API connection, then select that connection in an Extension tools workflow step. Model access and billing are managed in OpenAI. Requests send input to OpenAI and may be charged; review data handling and model output before use. Speech must be disclosed as AI-generated. OpenAI has announced shutdown of the non-realtime speech model on 6 January 2027.
 
 Input artifacts are limited to 24 MB; output artifacts to 25 MiB. Image input is PNG. Audio filenames must use a supported extension. A timeout or interrupted call can have an unknown outcome and is never retried automatically; check OpenAI logs before manually retrying. A successful request ID is returned with the output.
 

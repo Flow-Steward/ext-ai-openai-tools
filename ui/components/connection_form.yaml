@@ -1,0 +1,23 @@
+component_id: openai_connection
+type: connection_form
+title: OpenAI API connection
+description: Save an OpenAI project API key for this Flow Steward project. Saving does not send a request to OpenAI.
+data:
+  connection_kind: extension
+  connection_type: openai_api
+  config_fields: []
+  secret_fields: [api_key]
+  required_secret_fields: [api_key]
+defaults:
+  display_name: OpenAI
+fields:
+  - path: display_name
+    label: Display name
+    widget: text
+    required: true
+    help: A name that identifies this OpenAI project connection in workflows.
+  - path: api_key
+    label: OpenAI API key
+    widget: secret
+    required: true
+    help: Create a project API key at platform.openai.com/api-keys. Flow Steward stores it encrypted for this project.
