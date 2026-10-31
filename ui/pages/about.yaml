@@ -3,6 +3,7 @@ title: About & Connection
 components:
 - component_id: about_openai
   type: markdown
+  title: Overview
   body: '## OpenAI Tools
 
 
@@ -10,6 +11,8 @@ components:
     moderation, image generation and edits, transcription, and speech in workflow
     Extension tools steps. Calls send your data to OpenAI and may incur charges.
 
+
+    Requires Flow Steward 1.4.0 or later for typed workflow inputs and artifact handling.
 
     ### Connect
 

@@ -4,7 +4,7 @@ lifecycle:
   data_migrations: []
 extension_id: flowsteward.openai-tools
 kind: tool_provider
-version: 1.0.1
+version: 1.0.2
 display_name: OpenAI Tools
 description: Decisions, moderation, images and audio using a project OpenAI connection.
 vendor:
@@ -50,6 +50,8 @@ egress:
   hosts:
   - api.openai.com
 runtime:
+  compatibility:
+    platform_min: 1.4.0
   contract_version: extension_host_v2
   extension_contract_v2:
     connection_types: contracts/connection_types.yaml

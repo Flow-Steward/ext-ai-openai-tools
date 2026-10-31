@@ -1,6 +1,6 @@
 schema_version: extension_descriptor_v1
 extension_id: flowsteward.openai-tools
-release_version: 1.0.1
+release_version: 1.0.2
 extension_type: service_extension
 identity:
   display_name: OpenAI Tools
@@ -22,6 +22,8 @@ distribution:
   import_sources:
   - file
 runtime:
+  compatibility:
+    platform_min: 1.4.0
   contract_version: extension_host_v2
   extension_contract_v2:
     connection_types: contracts/connection_types.yaml
