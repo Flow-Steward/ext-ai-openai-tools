@@ -1,0 +1,92 @@
+schema_version: platform.workflow_bundle.v2
+kind: workflow_bundle
+metadata:
+  source_workflow_id: demo_openai_moderation
+  portability_kind: workflow_bundle
+  flow_steward_version: 1.4.0
+workflows:
+- workflow_id: demo_openai_moderation
+  version: 1.0.0
+  display_name: 'Demo: Moderate text with OpenAI'
+  description: Send supplied sample text to OpenAI moderation using a project connection.
+    Requires API access and may incur charges.
+  trigger:
+    confidence_threshold: 0.0
+  settings:
+    traits:
+      demo: true
+    policies:
+      branch_strategy: none
+    callable:
+      enabled: true
+      trigger_channels:
+      - ui
+      - api
+      - mcp
+      input_mode: fields
+      strict_inputs: true
+      expected_inputs:
+      - name: text
+        label: Text to review
+        type: paragraph
+        required: true
+        description: Text sent to OpenAI moderation.
+      output_mode: variables
+      expected_outputs:
+      - name: moderation_flagged
+        type: boolean
+        required: false
+        description: Whether OpenAI flagged the supplied text.
+      expected_artifacts: []
+      side_effects: []
+  tags:
+  - demo
+  - openai
+  - moderation
+  steps:
+  - step_id: moderate_text
+    display_name: Moderate text
+    step_kind: connector
+    connector_id: extension.flowsteward.openai-tools
+    connection_binding_jsonb: {}
+    override:
+      connector:
+        extension_id: flowsteward.openai-tools
+        operation_id: moderate_text
+        action_id: moderate_text
+    input_mapping_jsonb:
+      text: state.inputs.text
+    output_mapping_jsonb:
+      flagged: state.moderation_flagged
+    boundary_contract:
+      exit:
+      - moderation_flagged
+  - step_id: done
+    display_name: Finish moderation
+    step_kind: stop_success
+    override:
+      stop_success:
+        message: Moderation completed.
+  groups: []
+  execution_graph:
+    schema_version: 1
+    entry:
+      kind: step
+      id: moderate_text
+    edges:
+    - source:
+        kind: step
+        id: moderate_text
+      outcome:
+        name: success
+      target:
+        kind: step
+        id: done
+      rework: false
+  participants: []
+  for_each: []
+dependencies: {}
+import_hints:
+  default_enabled: false
+  import_state: draft
+  conflict_policy: rename_workflow

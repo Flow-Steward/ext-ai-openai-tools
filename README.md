@@ -10,9 +10,9 @@ API references: https://developers.openai.com/api/reference/resources/images, ht
 
 ## Example workflow
 
-Create a workflow with an Extension tools step, select **Moderate text** and your OpenAI API connection, and map its required Text input from a workflow variable. Map `result.flagged` to a workflow variable and route it through an If step for review. This sends the supplied text to OpenAI; use sample content when testing.
+Create a workflow with an Extension tools step, select **Moderate text** and your OpenAI API connection, and map its required Text input from a workflow variable. Map the **flagged** output to a workflow variable and route it through an If step for review. This sends the supplied text to OpenAI; use sample content when testing.
 
-An importable example is included at `artifacts/workflows/demo_openai_moderation.yaml`. Assign an OpenAI API connection before running it. The example is not deterministic and sends text to OpenAI.
+The extension includes a disabled projected example. To import a separate disabled draft, use `artifacts/workflows/demo_openai_moderation.bundle.yaml` with Flow Steward’s workflow import. Map its OpenAI extension dependency to the installed OpenAI Tools instance, then select a project OpenAI API connection in the imported step before enabling or running it. The example is not deterministic and sends text to OpenAI.
 
 ## Recover an interrupted request
 
