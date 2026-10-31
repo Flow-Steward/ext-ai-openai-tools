@@ -91,7 +91,12 @@ def handle(payload):
         result = provider.perform(
             action.get("action_id"), args, key, {"read": read, "write": write}
         )
-        return {"ok": True, "result": result, "errors": []}
+        return {
+            "ok": True,
+            "result": result,
+            "errors": [],
+            "provider_message_id": result.get("request_id", ""),
+        }
     except provider.ProviderError as exc:
         return {
             "ok": False,
@@ -100,6 +105,7 @@ def handle(payload):
             "error": str(exc),
             "errors": [{"code": exc.code, "message": str(exc)}],
             "request_id": exc.request_id,
+            "provider_message_id": exc.request_id,
             "retryable": False,
             "definitely_no_external_effect": exc.code
             in {

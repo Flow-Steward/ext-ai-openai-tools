@@ -84,3 +84,28 @@ def test_claim_id_is_stable_request_correlation():
     assert captured[0] == captured[1]
     assert captured[0].startswith("fs-")
     assert "effect-1" not in captured[0]
+
+
+def test_upstream_request_id_exposed_as_effect_metadata():
+    payload = {
+        "runtime_context": {"external_effect_id": "effect-1"},
+        "action": {
+            "action_id": "speech",
+            "input": {"connection_ref": "conn", "text": "hello"},
+            "target": {
+                "connection": {
+                    "connection_id": "conn",
+                    "connection_type_id": "openai_api",
+                    "secrets": {"api_key": "secret"},
+                }
+            },
+        },
+    }
+    with (
+        patch.object(main, "runtime_context_from_payload"),
+        patch.object(
+            main.provider, "perform", return_value={"request_id": "req_openai"}
+        ),
+    ):
+        response = main.handle(payload)
+    assert response["provider_message_id"] == "req_openai"

@@ -1,3 +1,5 @@
+import json
+
 import socket
 from unittest.mock import patch
 
@@ -230,3 +232,17 @@ def test_decision_keeps_evidence_separate_from_instructions():
         request.call_args.args[1]["questions"][0]["instructions"]
         == "Does it request a refund?"
     )
+
+
+def test_multibyte_transcript_over_replay_budget_fails_without_truncation():
+    body = json.dumps({"text": "界" * 70000}, ensure_ascii=False).encode()
+    with patch.object(provider, "request_bytes", return_value=(body, "req_long")):
+        with pytest.raises(provider.ProviderError) as error:
+            provider.perform(
+                "transcribe",
+                {"artifact_handle": "a", "filename": "voice.wav"},
+                "secret",
+                {"read": lambda _: b"audio"},
+            )
+    assert error.value.request_id == "req_long"
+    assert error.value.code == "invalid_response"

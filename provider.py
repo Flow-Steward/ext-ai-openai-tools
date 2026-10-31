@@ -290,7 +290,10 @@ def perform(operation, args, key, io):
         raw, rid = request_bytes("/audio/transcriptions", body, key, content_type)
         try:
             result = json.loads(raw)["text"]
-            if not isinstance(result, str) or len(result) > 200000:
+            if (
+                not isinstance(result, str)
+                or len(json.dumps(result, ensure_ascii=False).encode("utf-8")) > 200000
+            ):
                 raise ValueError()
         except (KeyError, TypeError, ValueError):
             raise ProviderError(
