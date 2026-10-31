@@ -49,7 +49,7 @@ def handle(payload):
         if (
             not args.get("connection_ref")
             or args["connection_ref"] != connection.get("connection_id")
-            or connection.get("connection_type_id") != "openai_api"
+            or connection.get("connection_type") != "openai_api"
         ):
             raise provider.ProviderError(
                 "invalid_connection", "Select the matching OpenAI API connection."

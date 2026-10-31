@@ -12,7 +12,7 @@ def test_test_mode_never_makes_paid_request():
             "target": {
                 "connection": {
                     "connection_id": "conn",
-                    "connection_type_id": "openai_api",
+                    "connection_type": "openai_api",
                     "secrets": {"api_key": "secret"},
                 }
             },
@@ -38,7 +38,7 @@ def test_missing_effect_claim_prevents_paid_operation():
             "target": {
                 "connection": {
                     "connection_id": "conn",
-                    "connection_type_id": "openai_api",
+                    "connection_type": "openai_api",
                     "secrets": {"api_key": "secret"},
                 }
             },
@@ -63,7 +63,7 @@ def test_claim_id_is_stable_request_correlation():
             "target": {
                 "connection": {
                     "connection_id": "conn",
-                    "connection_type_id": "openai_api",
+                    "connection_type": "openai_api",
                     "secrets": {"api_key": "secret"},
                 }
             },
@@ -95,7 +95,7 @@ def test_upstream_request_id_exposed_as_effect_metadata():
             "target": {
                 "connection": {
                     "connection_id": "conn",
-                    "connection_type_id": "openai_api",
+                    "connection_type": "openai_api",
                     "secrets": {"api_key": "secret"},
                 }
             },
@@ -109,3 +109,45 @@ def test_upstream_request_id_exposed_as_effect_metadata():
     ):
         response = main.handle(payload)
     assert response["provider_message_id"] == "req_openai"
+
+
+def test_host_connection_target_envelope_reaches_provider():
+    # Shape follows operation_targets.py's extension connection target.
+    payload = {
+        "contract_version": "extension_host_v2",
+        "runtime_context": {
+            "account_id": "account-a",
+            "project_id": "project-a",
+            "group_id": None,
+            "for_each_id": None,
+            "step_id": "step-a",
+            "step_execution_id": "execution-a",
+            "external_effect_id": "effect-a",
+        },
+        "action": {
+            "action_id": "moderate_text",
+            "input": {"connection_ref": "conn-a", "text": "sample"},
+            "target": {
+                "connection": {
+                    "connection_id": "conn-a",
+                    "account_id": "account-a",
+                    "project_id": "project-a",
+                    "display_name": "OpenAI",
+                    "connection_type": "openai_api",
+                    "environment": "",
+                    "credential_revision": 1,
+                    "config": {},
+                    "secret_refs": {},
+                    "secrets": {"api_key": "secret"},
+                }
+            },
+        },
+    }
+    with patch.object(
+        main.provider,
+        "perform",
+        return_value={"flagged": False, "categories": {}, "request_id": "req-a"},
+    ) as perform:
+        response = main.handle(payload)
+    assert response["ok"] is True
+    assert perform.call_args.args[2] == "secret"
