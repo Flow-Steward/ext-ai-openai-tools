@@ -12,7 +12,7 @@ components:
     Extension tools steps. Calls send your data to OpenAI and may incur charges.
 
 
-    Requires Flow Steward 1.4.0 or later for typed workflow inputs and artifact handling.
+    Requires extension runtime contract 1.4.0 or later; compatibility is checked during installation.
 
     ### Connect
 

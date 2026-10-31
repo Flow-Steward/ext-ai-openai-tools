@@ -1,6 +1,6 @@
 # OpenAI Tools
 
-Requires Flow Steward 1.4.0 or later for typed workflow inputs and artifact handling.
+Requires extension runtime contract 1.4.0 or later; compatibility is checked during installation.
 
 A project-scoped Flow Steward extension providing Decisions API, moderation, image generation and editing, transcription and speech. Create a project API key in the OpenAI API dashboard, open this extension’s Connection page and save it in a project-scoped OpenAI API connection, then select that connection in an Extension tools workflow step. Model access and billing are managed in OpenAI. Requests send input to OpenAI and may be charged; review data handling and model output before use. Speech must be disclosed as AI-generated. OpenAI has announced shutdown of the non-realtime speech model on 6 January 2027.
 
