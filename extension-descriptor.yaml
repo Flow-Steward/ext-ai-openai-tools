@@ -1,10 +1,10 @@
 schema_version: extension_descriptor_v1
 extension_id: flowsteward.openai-tools
-release_version: 1.0.4
+release_version: 1.1.0
 extension_type: service_extension
 identity:
   display_name: OpenAI Tools
-  description: OpenAI decisions, moderation, images and audio.
+  description: OpenAI decisions, moderation, images, audio and embeddings.
   tags:
   - openai
   - ai

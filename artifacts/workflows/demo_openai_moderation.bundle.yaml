@@ -3,7 +3,7 @@ kind: workflow_bundle
 metadata:
   source_workflow_id: demo_openai_moderation
   portability_kind: workflow_bundle
-  flow_steward_version: 1.4.0
+  flow_steward_version: 0.7.27
 workflows:
 - workflow_id: demo_openai_moderation
   version: 1.0.0

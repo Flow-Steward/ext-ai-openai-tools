@@ -27,6 +27,7 @@ connection_types:
   - edit_image
   - transcribe
   - speech
+  - embed
   safety_profile:
     requires_https: true
     requires_host_allowlist: false

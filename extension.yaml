@@ -4,9 +4,9 @@ lifecycle:
   data_migrations: []
 extension_id: flowsteward.openai-tools
 kind: tool_provider
-version: 1.0.4
+version: 1.1.0
 display_name: OpenAI Tools
-description: Decisions, moderation, images and audio using a project OpenAI connection.
+description: Decisions, moderation, images, audio and embeddings using a project OpenAI connection.
 vendor:
   name: Flow Steward
 listing:
@@ -16,7 +16,7 @@ listing:
   - image
   - audio
   - moderation
-  summary: Use OpenAI decisions, moderation, images and audio in workflows.
+  summary: Use OpenAI decisions, moderation, images, audio and embeddings in workflows.
 features:
 - tool
 - action
@@ -101,6 +101,11 @@ external_effects:
   idempotency: required
   test_mode_behavior: suppress
 - operation_id: speech
+  effect_kind: paid_api_call
+  channel: openai
+  idempotency: required
+  test_mode_behavior: suppress
+- operation_id: embed
   effect_kind: paid_api_call
   channel: openai
   idempotency: required

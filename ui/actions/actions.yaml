@@ -214,3 +214,31 @@ actions:
   result_fields:
   - output_artifact_handle
   - request_id
+- action_id: embed
+  title: Embed texts
+  description: Create ordered text embedding vectors using OpenAI.
+  required_scopes:
+  - extension:invoke
+  handler:
+    mode: extension
+  mutates_platform: false
+  workflow_visible: true
+  parameters:
+  - name: connection_ref
+    type: connection_ref
+    required: true
+  - name: texts
+    type: array
+    required: true
+  - name: model
+    type: string
+    required: false
+  - name: dimensions
+    type: number
+    required: false
+  result_fields:
+  - vectors
+  - model
+  - dimensions
+  - usage
+  - request_id

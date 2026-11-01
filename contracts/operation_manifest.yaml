@@ -275,3 +275,52 @@ operations:
   - name: request_id
     value_type: text
   error_codes: *id001
+- operation_id: embed
+  display_name: Embed texts
+  description: Create ordered text embedding vectors using OpenAI.
+  operation_kind: action
+  category: ai
+  connection_type_ids:
+  - openai_api
+  inputs:
+  - name: connection_ref
+    value_type: connection_ref
+    required: true
+  - name: texts
+    value_type: array
+    required: true
+    schema:
+      type: array
+      minItems: 1
+      maxItems: 4
+      items:
+        type: string
+        minLength: 1
+        maxLength: 8000
+  - name: model
+    value_type: text
+    required: false
+    schema:
+      type: string
+      enum:
+      - text-embedding-3-small
+      - text-embedding-3-large
+  - name: dimensions
+    value_type: integer
+    required: false
+    schema:
+      type: integer
+      minimum: 1
+      maximum: 3072
+  outputs:
+  - name: vectors
+    value_type: array
+  - name: model
+    value_type: text
+  - name: dimensions
+    value_type: number
+  - name: usage
+    value_type: object
+  - name: request_id
+    value_type: text
+  error_codes: *id001

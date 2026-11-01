@@ -3,6 +3,7 @@
 import base64
 from contextvars import ContextVar
 import json
+import math
 import http.client
 import socket
 import urllib.error
@@ -205,11 +206,91 @@ def output_artifact(io, data, content_type, request_id):
         ) from None
 
 
+def embeddings(args, key):
+    texts = args.get("texts")
+    if not isinstance(texts, list) or not 1 <= len(texts) <= 4:
+        raise ProviderError("invalid_payload", "Provide one to four texts.")
+    for value in texts:
+        try:
+            valid = (
+                isinstance(value, str)
+                and bool(value.strip())
+                and len(value.encode("utf-8")) <= 8000
+            )
+        except UnicodeEncodeError:
+            valid = False
+        if not valid:
+            raise ProviderError(
+                "invalid_payload",
+                "Each text must be nonempty valid UTF-8, at most 8,000 bytes.",
+            )
+    model = args.get("model", "text-embedding-3-small")
+    limits = {"text-embedding-3-small": 1536, "text-embedding-3-large": 3072}
+    if not isinstance(model, str) or model not in limits:
+        raise ProviderError("invalid_payload", "Select a supported embedding model.")
+    dimensions = args.get("dimensions", limits[model])
+    if type(dimensions) is not int or not 1 <= dimensions <= limits[model]:
+        raise ProviderError(
+            "invalid_payload",
+            "Dimensions must be an integer within the selected model's limit.",
+        )
+    body = {"model": model, "input": texts, "encoding_format": "float"}
+    if "dimensions" in args:
+        body["dimensions"] = dimensions
+    response, rid = request_json("/embeddings", body, key)
+    try:
+        if response["model"] != model:
+            raise ValueError()
+        data = response["data"]
+        if not isinstance(data, list) or len(data) != len(texts):
+            raise ValueError()
+        vectors = [None] * len(texts)
+        for row in data:
+            index, vector = row["index"], row["embedding"]
+            if (
+                type(index) is not int
+                or not 0 <= index < len(texts)
+                or vectors[index] is not None
+            ):
+                raise ValueError()
+            if not isinstance(vector, list) or len(vector) != dimensions:
+                raise ValueError()
+            if any(
+                type(value) not in (int, float) or not math.isfinite(float(value))
+                for value in vector
+            ):
+                raise ValueError()
+            vectors[index] = [float(value) for value in vector]
+        usage = response["usage"]
+        prompt_tokens, total_tokens = usage["prompt_tokens"], usage["total_tokens"]
+        if (
+            any(
+                type(value) is not int or not 0 <= value <= 2_147_483_647
+                for value in (prompt_tokens, total_tokens)
+            )
+            or total_tokens < prompt_tokens
+        ):
+            raise ValueError()
+        return {
+            "vectors": vectors,
+            "model": model,
+            "dimensions": dimensions,
+            "usage": {"prompt_tokens": prompt_tokens, "total_tokens": total_tokens},
+            "request_id": rid,
+        }
+    except (KeyError, TypeError, ValueError, OverflowError):
+        raise ProviderError(
+            "invalid_response", "OpenAI returned invalid embeddings.", rid
+        ) from None
+
+
 def perform(operation, args, key, io):
     if not key or not isinstance(key, str):
         raise ProviderError(
             "not_configured", "Add an OpenAI API key to the selected connection."
         )
+    if operation == "embed":
+        return embeddings(args, key)
     if operation in ("predicate", "choice", "score"):
         prompt = text(args.get("prompt"), "prompt")
         evidence = text(args.get("evidence"), "evidence")

@@ -1,0 +1,91 @@
+schema_version: platform.workflow_bundle.v2
+kind: workflow_bundle
+metadata:
+  source_workflow_id: demo_openai_embeddings
+  portability_kind: workflow_bundle
+  flow_steward_version: 0.7.27
+workflows:
+- workflow_id: demo_openai_embeddings
+  version: 1.0.0
+  display_name: 'Demo: Embed texts with OpenAI'
+  description: Create vectors from supplied sample texts using a project connection. Calls are billed per input token.
+  trigger:
+    confidence_threshold: 0.0
+  settings:
+    traits:
+      demo: true
+    policies:
+      branch_strategy: none
+    callable:
+      enabled: true
+      trigger_channels:
+      - ui
+      - api
+      - mcp
+      input_mode: fields
+      strict_inputs: true
+      expected_inputs:
+      - name: texts
+        label: Texts
+        type: array
+        required: true
+        description: One to four sample texts sent to OpenAI.
+      output_mode: variables
+      expected_outputs:
+      - name: embeddings
+        type: array
+        required: false
+        description: Embedding vectors in input order.
+      expected_artifacts: []
+      side_effects: []
+  tags:
+  - demo
+  - openai
+  - embeddings
+  steps:
+  - step_id: embed
+    display_name: Embed texts
+    step_kind: connector
+    connector_id: extension.flowsteward.openai-tools
+    connection_binding_jsonb: {}
+    override:
+      connector:
+        extension_id: flowsteward.openai-tools
+        operation_id: embed
+        action_id: embed
+    input_mapping_jsonb:
+      texts: state.inputs.texts
+    output_mapping_jsonb:
+      vectors: state.embeddings
+    boundary_contract:
+      exit:
+      - embeddings
+  - step_id: done
+    display_name: Finish embeddings
+    step_kind: stop_success
+    override:
+      stop_success:
+        message: Embeddings completed.
+  groups: []
+  execution_graph:
+    schema_version: 1
+    entry:
+      kind: step
+      id: embed
+    edges:
+    - source:
+        kind: step
+        id: embed
+      outcome:
+        name: success
+      target:
+        kind: step
+        id: done
+      rework: false
+  participants: []
+  for_each: []
+dependencies: {}
+import_hints:
+  default_enabled: false
+  import_state: draft
+  conflict_policy: rename_workflow
