@@ -7,7 +7,7 @@ forms:
     widget_type: textarea
     label: Instructions
     required: true
-    help_text: Describe the question or image to create. Maximum 16,000 characters.
+    help_text: Describe the decision to make from the evidence. Maximum 16,000 characters.
   - name: evidence
     widget_type: textarea
     label: Evidence
@@ -21,7 +21,7 @@ forms:
     widget_type: textarea
     label: Instructions
     required: true
-    help_text: Describe the question or image to create. Maximum 16,000 characters.
+    help_text: Describe the decision to make from the evidence. Maximum 16,000 characters.
   - name: evidence
     widget_type: textarea
     label: Evidence
@@ -40,7 +40,7 @@ forms:
     widget_type: textarea
     label: Instructions
     required: true
-    help_text: Describe the question or image to create. Maximum 16,000 characters.
+    help_text: Describe the decision to make from the evidence. Maximum 16,000 characters.
   - name: evidence
     widget_type: textarea
     label: Evidence
@@ -77,7 +77,7 @@ forms:
     widget_type: textarea
     label: Instructions
     required: true
-    help_text: Describe the question or image to create. Maximum 32,000 characters.
+    help_text: Describe the image to create. Maximum 32,000 characters.
 - operation_id: edit_image
   title: Edit image
   section: OpenAI Tools
@@ -91,7 +91,7 @@ forms:
     widget_type: textarea
     label: Instructions
     required: true
-    help_text: Describe the question or image to create. Maximum 32,000 characters.
+    help_text: Describe the changes to make to the source image. Maximum 32,000 characters.
 - operation_id: transcribe
   title: Transcribe audio
   section: OpenAI Tools
