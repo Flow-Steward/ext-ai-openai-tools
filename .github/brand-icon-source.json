@@ -1,0 +1,30 @@
+{
+  "provider": "openai",
+  "retrieved_date": "2026-11-03",
+  "official_guidelines_url": "https://openai.com/brand/",
+  "download_url": "https://cdn.openai.com/brand/openai-logos.zip",
+  "archive_file": "/private/tmp/fs-ai-logo-assets/openai/openai-logos.zip",
+  "archive_sha256": "c54e85ab5884228f89f0230dd8effa8d588cad78166fe954135f4afa553222db",
+  "archive_member": "OpenAI-logos/PNGs/OAI_OpenAI-Blossom_Black.png",
+  "source_file": "/private/tmp/fs-ai-logo-assets/openai/OAI_OpenAI-Blossom_Black.png",
+  "source_sha256": "9897fc6c24e0dfb8cb81c287f456d7a01a5861066d7f3f93d2392e4e1c9eff38",
+  "output_file": "/private/tmp/fs-ai-logo-assets/openai/icon.png",
+  "output_sha256": "9761c271afd3ed8e7e2c6b8095d96de9e73653b9748c7fa97e6e40d90da0658d",
+  "output_bytes": 12026,
+  "output_dimensions": [
+    512,
+    512
+  ],
+  "conversion_details": [
+    "Official PNG extracted without modification; its complete 716x716 canvas (including original clearspace) was uniformly resized to 512x512.",
+    "Black artwork unchanged; transparency composited on plain white to keep the official black mark readable in both light and dark marketplace tiles. No redraw, crop, rotation, recolor, effects, or extra marks.",
+    "ImageMagick: magick OAI_OpenAI-Blossom_Black.png -resize 512x512 -background white -alpha remove -alpha off icon.png"
+  ],
+  "trademark_notice_suggestion": "OpenAI and the Blossom logo are trademarks of OpenAI. This independent Flow Steward integration is not affiliated with, endorsed by, or sponsored by OpenAI.",
+  "usage_notes": [
+    "Use Blossom only as the provider icon next to the OpenAI Tools product name in the extension listing. Do not make it Flow Steward primary branding.",
+    "Retain official full-canvas spacing. Do not combine with OpenAI wordmark into a new lockup.",
+    "No legal acceptance checkbox was clicked. The public CDN archive was downloaded directly."
+  ],
+  "visual_inspection": "Source and final PNG inspected with view_image; final artwork centered and unclipped with official clearspace."
+}
