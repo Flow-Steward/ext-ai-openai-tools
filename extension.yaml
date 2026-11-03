@@ -9,6 +9,8 @@ display_name: OpenAI Tools
 description: Decisions, moderation, images, audio and embeddings using a project OpenAI connection.
 vendor:
   name: Flow Steward
+  support_url: https://github.com/Flow-Steward/ext-ai-openai-tools/issues
+  website_url: https://github.com/Flow-Steward/ext-ai-openai-tools
 listing:
   category: ai
   tags:
