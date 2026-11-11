@@ -1,6 +1,10 @@
 # OpenAI Tools
 
-Requires extension runtime contract 1.4.0 or later; compatibility is checked during installation.
+Build content-review, media-preparation and text-analysis workflows with OpenAI Tools. It provides focused actions across several OpenAI API families. Make a yes-or-no decision, choose from supplied options or score ordered levels using a prompt and evidence. Moderate text or an image and pass the flagged result and category information into review or routing steps.
+
+Media actions generate or edit an image artifact, transcribe an audio artifact to text, or turn text into a speech artifact. Text embedding actions return ordered vectors with model, dimension and usage information. These functions can support content preparation, transcription pipelines, moderation queues and small embedding batches. They are workflow tools; this extension does not add a conversational model to the agent model catalog.
+
+Each action uses a selected project OpenAI connection and returns its relevant result or output artifact plus a provider request ID. Image inputs accept PNG, JPEG and WebP up to 15 MB; audio inputs are limited to 24 MB. Embedding calls accept one to four texts and do not chunk them automatically. Inputs are sent to OpenAI, where model access, pricing and API availability apply. The speech model is scheduled to shut down on 6 January 2027.
 
 A project-scoped Flow Steward extension providing Decisions API, moderation, image generation and editing, transcription, speech and text embeddings. Create a project API key in the OpenAI API dashboard, open this extension’s Connection page and save it in a project-scoped OpenAI API connection, then select that connection in an Extension tools workflow step. Model access and billing are managed in OpenAI. Requests send input to OpenAI and may be charged; review data handling and model output before use. Speech must be disclosed as AI-generated. OpenAI has announced shutdown of the non-realtime speech model on 6 January 2027.
 
