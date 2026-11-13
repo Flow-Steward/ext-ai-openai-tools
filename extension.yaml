@@ -4,7 +4,7 @@ lifecycle:
   data_migrations: []
 extension_id: flowsteward.openai-tools
 kind: tool_provider
-version: 1.1.3
+version: 1.1.4
 display_name: OpenAI Tools
 description: |-
   Build content-review, media-preparation and text-analysis workflows with OpenAI Tools. It provides focused actions across several OpenAI API families. Make a yes-or-no decision, choose from supplied options or score ordered levels using a prompt and evidence. Moderate text or an image and pass the flagged result and category information into review or routing steps.

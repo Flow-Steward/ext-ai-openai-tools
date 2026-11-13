@@ -1,7 +1,8 @@
 actions:
 - action_id: predicate
-  title: Decide yes or no
-  description: Decide yes or no with OpenAI.
+  title: Estimate a yes probability
+  description: Evaluate a question against supplied evidence using OpenAI. Returns value as a number from 0 to 1
+    representing yes probability, rather than a boolean; choose a threshold in a later workflow step.
   required_scopes:
   - extension:invoke
   - artifact:read
@@ -24,8 +25,9 @@ actions:
   - value
   - request_id
 - action_id: choice
-  title: Choose an option
-  description: Choose an option with OpenAI.
+  title: Choose an option from evidence
+  description: Use OpenAI to select one of 2–20 supplied option strings based on instructions and evidence. Returns
+    the selected string as value.
   required_scopes:
   - extension:invoke
   - artifact:read
@@ -51,8 +53,9 @@ actions:
   - value
   - request_id
 - action_id: score
-  title: Score ordered levels
-  description: Score ordered levels with OpenAI.
+  title: Score evidence against ordered levels
+  description: Use OpenAI to score evidence on 2–20 supplied levels in order. Returns a numeric value from 0 through
+    level count minus one; the score can fall between levels.
   required_scopes:
   - extension:invoke
   - artifact:read
@@ -78,8 +81,9 @@ actions:
   - value
   - request_id
 - action_id: moderate_text
-  title: Moderate text
-  description: Moderate text with OpenAI.
+  title: Check text for flagged content
+  description: Send text to OpenAI moderation and return flagged plus category flags. Use the outputs to route content
+    for review; this action does not block or remove content.
   required_scopes:
   - extension:invoke
   - artifact:read
@@ -100,8 +104,9 @@ actions:
   - categories
   - request_id
 - action_id: moderate_image
-  title: Moderate image
-  description: Moderate image with OpenAI.
+  title: Check an image for flagged content
+  description: Send a PNG, JPEG or WebP artifact to OpenAI moderation and return flagged plus category flags. The
+    action does not modify the image or make a workflow routing decision.
   required_scopes:
   - extension:invoke
   - artifact:read
@@ -122,8 +127,9 @@ actions:
   - categories
   - request_id
 - action_id: generate_image
-  title: Generate image
-  description: Generate image with OpenAI.
+  title: Generate an image from a prompt
+  description: Send a description to OpenAI and save the generated image as a workflow artifact. Returns output_artifact_handle
+    and the provider request ID.
   required_scopes:
   - extension:invoke
   - artifact:read
@@ -143,8 +149,9 @@ actions:
   - output_artifact_handle
   - request_id
 - action_id: edit_image
-  title: Edit image
-  description: Edit image with OpenAI.
+  title: Edit an image using instructions
+  description: Send a source image artifact and editing instructions to OpenAI. Saves the edited image as a new
+    workflow artifact and returns its handle.
   required_scopes:
   - extension:invoke
   - artifact:read
@@ -167,8 +174,9 @@ actions:
   - output_artifact_handle
   - request_id
 - action_id: transcribe
-  title: Transcribe audio
-  description: Transcribe audio with OpenAI.
+  title: Transcribe an audio file to text
+  description: Send an audio artifact and its filename to OpenAI transcription. Returns transcript text and a provider
+    request ID; supply the real supported audio extension.
   required_scopes:
   - extension:invoke
   - artifact:read
@@ -191,8 +199,9 @@ actions:
   - text
   - request_id
 - action_id: speech
-  title: Synthesize speech
-  description: Synthesize speech with OpenAI.
+  title: Generate speech from text
+  description: Send up to 4096 characters to OpenAI and save the generated speech as an audio artifact. Select a
+    voice; disclose AI-generated speech to listeners.
   required_scopes:
   - extension:invoke
   - artifact:read
@@ -215,8 +224,9 @@ actions:
   - output_artifact_handle
   - request_id
 - action_id: embed
-  title: Embed texts
-  description: Create ordered text embedding vectors using OpenAI.
+  title: Generate text embeddings
+  description: Use OpenAI to generate one numeric embedding per input text, in order. Accepts 1–4 texts and returns
+    vectors, model, dimensions, usage and request ID; use matching model and dimensions in your vector store.
   required_scopes:
   - extension:invoke
   handler:

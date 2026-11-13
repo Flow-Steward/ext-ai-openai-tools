@@ -1,123 +1,141 @@
 forms:
 - operation_id: predicate
-  title: Decide yes or no
+  title: Estimate a yes probability
   section: OpenAI Tools
   fields:
   - name: prompt
     widget_type: textarea
-    label: Instructions
+    label: Decision instructions
     required: true
-    help_text: Describe the decision to make from the evidence. Maximum 16,000 characters.
+    help_text: Explain the question to evaluate using Evidence. Maximum 16000 characters.
+    placeholder: Does the customer request a refund?
   - name: evidence
     widget_type: textarea
-    label: Evidence
+    label: Evidence to evaluate
     required: true
-    help_text: Provide the material the question should evaluate. Maximum 16,000 characters.
+    help_text: Text the decision should evaluate, such as a customer message. Maximum 16000 characters.
+    placeholder: I would like to return my order and get a refund.
 - operation_id: choice
-  title: Choose an option
+  title: Choose an option from evidence
   section: OpenAI Tools
   fields:
   - name: prompt
     widget_type: textarea
-    label: Instructions
+    label: Decision instructions
     required: true
-    help_text: Describe the decision to make from the evidence. Maximum 16,000 characters.
+    help_text: Explain the question to evaluate using Evidence. Maximum 16000 characters.
+    placeholder: Classify the customer request by topic.
   - name: evidence
     widget_type: textarea
-    label: Evidence
+    label: Evidence to evaluate
     required: true
-    help_text: Provide the material the question should evaluate. Maximum 16,000 characters.
+    help_text: Text the decision should evaluate, such as a customer message. Maximum 16000 characters.
+    placeholder: I would like to return my order and get a refund.
   - name: choices
     widget_type: json
-    label: Choices (JSON array)
+    label: Allowed options (JSON array)
     required: true
-    help_text: Enter 2–20 distinct strings, for example ["low", "high"].
+    help_text: Supply 2–20 distinct nonempty strings, each at most 100 characters. The returned value is one of
+      these exact strings.
+    placeholder: '["billing","technical","general"]'
 - operation_id: score
-  title: Score ordered levels
+  title: Score evidence against ordered levels
   section: OpenAI Tools
   fields:
   - name: prompt
     widget_type: textarea
-    label: Instructions
+    label: Decision instructions
     required: true
-    help_text: Describe the decision to make from the evidence. Maximum 16,000 characters.
+    help_text: Explain the question to evaluate using Evidence. Maximum 16000 characters.
+    placeholder: Rate how urgently this customer request needs attention.
   - name: evidence
     widget_type: textarea
-    label: Evidence
+    label: Evidence to evaluate
     required: true
-    help_text: Provide the material the question should evaluate. Maximum 16,000 characters.
+    help_text: Text the decision should evaluate, such as a customer message. Maximum 16000 characters.
+    placeholder: I would like to return my order and get a refund.
   - name: levels
     widget_type: json
-    label: Ordered levels (JSON array)
+    label: Levels from lowest to highest (JSON array)
     required: true
-    help_text: Enter 2–20 distinct strings, for example ["low", "high"].
+    help_text: Supply 2–20 distinct nonempty labels, each at most 100 characters, ordered from lowest to highest.
+      A numeric score ranges from 0 through level count minus one.
+    placeholder: '["routine","important","urgent"]'
 - operation_id: moderate_text
-  title: Moderate text
+  title: Check text for flagged content
   section: OpenAI Tools
   fields:
   - name: text
     widget_type: textarea
-    label: Text
+    label: Text to check
     required: true
-    help_text: Enter the content to process. Maximum 16,000 characters.
+    help_text: Text for content moderation, at most 16000 characters. Inspect flagged and categories in a later
+      workflow step.
+    placeholder: A customer message to review.
 - operation_id: moderate_image
-  title: Moderate image
+  title: Check an image for flagged content
   section: OpenAI Tools
   fields:
   - name: artifact_handle
     widget_type: artifact_picker
-    label: Input file
+    label: Source image artifact
     required: true
-    help_text: PNG, JPEG, or WebP, up to 15 MB (15,000,000 bytes).
+    help_text: 'Map an image artifact from an earlier step: PNG, JPEG or WebP, up to 15000000 bytes.'
 - operation_id: generate_image
-  title: Generate image
+  title: Generate an image from a prompt
   section: OpenAI Tools
   fields:
   - name: prompt
     widget_type: textarea
-    label: Instructions
+    label: Image description
     required: true
-    help_text: Describe the image to create. Maximum 32,000 characters.
+    help_text: Describe the image to generate, including subject, composition and appearance. Maximum 32000 characters.
+    placeholder: A studio photograph of a blue ceramic cup on a white background.
 - operation_id: edit_image
-  title: Edit image
+  title: Edit an image using instructions
   section: OpenAI Tools
   fields:
   - name: artifact_handle
     widget_type: artifact_picker
-    label: Input file
+    label: Source image artifact
     required: true
-    help_text: PNG, JPEG, or WebP, up to 15 MB (15,000,000 bytes).
+    help_text: 'Map an image artifact from an earlier step: PNG, JPEG or WebP, up to 15000000 bytes.'
   - name: prompt
     widget_type: textarea
-    label: Instructions
+    label: Image editing instructions
     required: true
-    help_text: Describe the changes to make to the source image. Maximum 32,000 characters.
+    help_text: Describe changes to the selected source image. Maximum 32000 characters.
+    placeholder: Replace the background with a plain white studio background.
 - operation_id: transcribe
-  title: Transcribe audio
+  title: Transcribe an audio file to text
   section: OpenAI Tools
   fields:
   - name: artifact_handle
     widget_type: artifact_picker
-    label: Input file
+    label: Audio artifact
     required: true
+    help_text: Map an audio artifact from an earlier workflow step, up to 24 MB. Supply its actual filename below.
   - name: filename
     widget_type: text
-    label: Audio filename
+    label: Original audio filename
     required: true
-    help_text: 'Use the real audio extension: mp3, mp4, mpeg, mpga, m4a, wav or webm.
-      Maximum 24 MB.'
+    help_text: 'Use the real audio extension: mp3, mp4, mpeg, mpga, m4a, wav or webm. The extension is required
+      for the upload.'
+    placeholder: meeting.wav
 - operation_id: speech
-  title: Synthesize speech
+  title: Generate speech from text
   section: OpenAI Tools
   fields:
   - name: text
     widget_type: textarea
-    label: Text
+    label: Text to speak
     required: true
-    help_text: Enter the content to process. Maximum 4,096 characters.
+    help_text: Text to synthesize, at most 4096 characters. Output is an audio artifact; inform listeners that the
+      voice is AI-generated.
+    placeholder: Your order is ready for collection.
   - name: voice
     widget_type: select
-    label: Voice
+    label: Speech voice
     required: false
     default: alloy
     options:
@@ -143,21 +161,26 @@ forms:
       value: shimmer
     - label: Verse
       value: verse
+    help_text: Choose an available voice; alloy is the default. The voice changes the generated speech, not the
+      supplied wording.
 - operation_id: embed
-  title: Embed texts
+  title: Generate text embeddings
   section: OpenAI Tools
   fields:
   - name: texts
     widget_type: json
-    label: Texts (JSON array)
+    label: Texts to embed (JSON array)
     required: true
-    help_text: 'Enter 1–4 texts, for example ["one text"]. Each must be nonempty and at most 8,000 UTF-8 bytes. Text is sent unchanged to OpenAI.'
+    help_text: Supply 1–4 nonempty strings, each at most 8000 UTF-8 bytes. No automatic splitting or truncation.
+      Returned vectors preserve this order.
+    placeholder: '["Refunds are available within 30 days."]'
   - name: model
     widget_type: select
     label: Embedding model
     required: false
     default: text-embedding-3-small
-    help_text: OpenAI charges per input token. Use the same model and dimensions for a vector index.
+    help_text: 'Default: text-embedding-3-small (1536 dimensions). Large defaults to 3072. Use the same model for
+      stored text and search questions.'
     options:
     - label: Text embedding 3 small
       value: text-embedding-3-small
@@ -165,6 +188,8 @@ forms:
       value: text-embedding-3-large
   - name: dimensions
     widget_type: number
-    label: Dimensions
+    label: Embedding dimensions
     required: false
-    help_text: 'Optional integer: 1–1,536 for small or 1–3,072 for large. Blank uses the model default (1,536 or 3,072).'
+    help_text: 'Optional integer: 1–1536 for small or 1–3072 for large. Blank uses the model default. Match your
+      vector-store dimensions exactly.'
+    placeholder: '1536'

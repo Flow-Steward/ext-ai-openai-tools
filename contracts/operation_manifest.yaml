@@ -1,7 +1,8 @@
 operations:
 - operation_id: predicate
-  display_name: Decide yes or no
-  description: Decide yes or no with OpenAI.
+  display_name: Estimate a yes probability
+  description: Evaluate a question against supplied evidence using OpenAI. Returns value as a number from 0 to 1
+    representing yes probability, rather than a boolean; choose a threshold in a later workflow step.
   operation_kind: action
   category: ai
   connection_type_ids:
@@ -10,6 +11,7 @@ operations:
   - name: connection_ref
     value_type: connection_ref
     required: true
+    display_name: Project connection
   - name: prompt
     value_type: text
     required: true
@@ -17,6 +19,7 @@ operations:
       type: string
       minLength: 1
       maxLength: 16000
+    display_name: Decision instructions
   - name: evidence
     value_type: text
     required: true
@@ -24,6 +27,7 @@ operations:
       type: string
       minLength: 1
       maxLength: 16000
+    display_name: Evidence to evaluate
   outputs:
   - name: value
     value_type: number
@@ -43,8 +47,9 @@ operations:
   - artifact_access_failed
   - internal_error
 - operation_id: choice
-  display_name: Choose an option
-  description: Choose an option with OpenAI.
+  display_name: Choose an option from evidence
+  description: Use OpenAI to select one of 2–20 supplied option strings based on instructions and evidence. Returns
+    the selected string as value.
   operation_kind: action
   category: ai
   connection_type_ids:
@@ -53,6 +58,7 @@ operations:
   - name: connection_ref
     value_type: connection_ref
     required: true
+    display_name: Project connection
   - name: prompt
     value_type: text
     required: true
@@ -60,6 +66,7 @@ operations:
       type: string
       minLength: 1
       maxLength: 16000
+    display_name: Decision instructions
   - name: evidence
     value_type: text
     required: true
@@ -67,6 +74,7 @@ operations:
       type: string
       minLength: 1
       maxLength: 16000
+    display_name: Evidence to evaluate
   - name: choices
     value_type: array
     required: true
@@ -78,6 +86,7 @@ operations:
         type: string
         minLength: 1
         maxLength: 100
+    display_name: Allowed options (JSON array)
   outputs:
   - name: value
     value_type: text
@@ -85,8 +94,9 @@ operations:
     value_type: text
   error_codes: *id001
 - operation_id: score
-  display_name: Score ordered levels
-  description: Score ordered levels with OpenAI.
+  display_name: Score evidence against ordered levels
+  description: Use OpenAI to score evidence on 2–20 supplied levels in order. Returns a numeric value from 0 through
+    level count minus one; the score can fall between levels.
   operation_kind: action
   category: ai
   connection_type_ids:
@@ -95,6 +105,7 @@ operations:
   - name: connection_ref
     value_type: connection_ref
     required: true
+    display_name: Project connection
   - name: prompt
     value_type: text
     required: true
@@ -102,6 +113,7 @@ operations:
       type: string
       minLength: 1
       maxLength: 16000
+    display_name: Decision instructions
   - name: evidence
     value_type: text
     required: true
@@ -109,6 +121,7 @@ operations:
       type: string
       minLength: 1
       maxLength: 16000
+    display_name: Evidence to evaluate
   - name: levels
     value_type: array
     required: true
@@ -120,6 +133,7 @@ operations:
         type: string
         minLength: 1
         maxLength: 100
+    display_name: Levels from lowest to highest (JSON array)
   outputs:
   - name: value
     value_type: number
@@ -127,8 +141,9 @@ operations:
     value_type: text
   error_codes: *id001
 - operation_id: moderate_text
-  display_name: Moderate text
-  description: Moderate text with OpenAI.
+  display_name: Check text for flagged content
+  description: Send text to OpenAI moderation and return flagged plus category flags. Use the outputs to route content
+    for review; this action does not block or remove content.
   operation_kind: action
   category: ai
   connection_type_ids:
@@ -137,6 +152,7 @@ operations:
   - name: connection_ref
     value_type: connection_ref
     required: true
+    display_name: Project connection
   - name: text
     value_type: text
     required: true
@@ -144,6 +160,7 @@ operations:
       type: string
       minLength: 1
       maxLength: 16000
+    display_name: Text to check
   outputs:
   - name: flagged
     value_type: boolean
@@ -153,8 +170,9 @@ operations:
     value_type: text
   error_codes: *id001
 - operation_id: moderate_image
-  display_name: Moderate image
-  description: Moderate image with OpenAI.
+  display_name: Check an image for flagged content
+  description: Send a PNG, JPEG or WebP artifact to OpenAI moderation and return flagged plus category flags. The
+    action does not modify the image or make a workflow routing decision.
   operation_kind: action
   category: ai
   connection_type_ids:
@@ -163,9 +181,11 @@ operations:
   - name: connection_ref
     value_type: connection_ref
     required: true
+    display_name: Project connection
   - name: artifact_handle
     value_type: artifact_handle
     required: true
+    display_name: Source image artifact
   outputs:
   - name: flagged
     value_type: boolean
@@ -175,8 +195,9 @@ operations:
     value_type: text
   error_codes: *id001
 - operation_id: generate_image
-  display_name: Generate image
-  description: Generate image with OpenAI.
+  display_name: Generate an image from a prompt
+  description: Send a description to OpenAI and save the generated image as a workflow artifact. Returns output_artifact_handle
+    and the provider request ID.
   operation_kind: action
   category: ai
   connection_type_ids:
@@ -185,6 +206,7 @@ operations:
   - name: connection_ref
     value_type: connection_ref
     required: true
+    display_name: Project connection
   - name: prompt
     value_type: text
     required: true
@@ -192,6 +214,7 @@ operations:
       type: string
       minLength: 1
       maxLength: 32000
+    display_name: Image description
   outputs:
   - name: output_artifact_handle
     value_type: artifact_handle
@@ -199,8 +222,9 @@ operations:
     value_type: text
   error_codes: *id001
 - operation_id: edit_image
-  display_name: Edit image
-  description: Edit image with OpenAI.
+  display_name: Edit an image using instructions
+  description: Send a source image artifact and editing instructions to OpenAI. Saves the edited image as a new
+    workflow artifact and returns its handle.
   operation_kind: action
   category: ai
   connection_type_ids:
@@ -209,9 +233,11 @@ operations:
   - name: connection_ref
     value_type: connection_ref
     required: true
+    display_name: Project connection
   - name: artifact_handle
     value_type: artifact_handle
     required: true
+    display_name: Source image artifact
   - name: prompt
     value_type: text
     required: true
@@ -219,6 +245,7 @@ operations:
       type: string
       minLength: 1
       maxLength: 32000
+    display_name: Image editing instructions
   outputs:
   - name: output_artifact_handle
     value_type: artifact_handle
@@ -226,8 +253,9 @@ operations:
     value_type: text
   error_codes: *id001
 - operation_id: transcribe
-  display_name: Transcribe audio
-  description: Transcribe audio with OpenAI.
+  display_name: Transcribe an audio file to text
+  description: Send an audio artifact and its filename to OpenAI transcription. Returns transcript text and a provider
+    request ID; supply the real supported audio extension.
   operation_kind: action
   category: ai
   connection_type_ids:
@@ -236,12 +264,15 @@ operations:
   - name: connection_ref
     value_type: connection_ref
     required: true
+    display_name: Project connection
   - name: artifact_handle
     value_type: artifact_handle
     required: true
+    display_name: Audio artifact
   - name: filename
     value_type: text
     required: true
+    display_name: Original audio filename
   outputs:
   - name: text
     value_type: text
@@ -249,8 +280,9 @@ operations:
     value_type: text
   error_codes: *id001
 - operation_id: speech
-  display_name: Synthesize speech
-  description: Synthesize speech with OpenAI.
+  display_name: Generate speech from text
+  description: Send up to 4096 characters to OpenAI and save the generated speech as an audio artifact. Select a
+    voice; disclose AI-generated speech to listeners.
   operation_kind: action
   category: ai
   connection_type_ids:
@@ -259,6 +291,7 @@ operations:
   - name: connection_ref
     value_type: connection_ref
     required: true
+    display_name: Project connection
   - name: text
     value_type: text
     required: true
@@ -266,9 +299,11 @@ operations:
       type: string
       minLength: 1
       maxLength: 4096
+    display_name: Text to speak
   - name: voice
     value_type: text
     required: false
+    display_name: Speech voice
   outputs:
   - name: output_artifact_handle
     value_type: artifact_handle
@@ -276,8 +311,9 @@ operations:
     value_type: text
   error_codes: *id001
 - operation_id: embed
-  display_name: Embed texts
-  description: Create ordered text embedding vectors using OpenAI.
+  display_name: Generate text embeddings
+  description: Use OpenAI to generate one numeric embedding per input text, in order. Accepts 1–4 texts and returns
+    vectors, model, dimensions, usage and request ID; use matching model and dimensions in your vector store.
   operation_kind: action
   category: ai
   connection_type_ids:
@@ -286,6 +322,7 @@ operations:
   - name: connection_ref
     value_type: connection_ref
     required: true
+    display_name: Project connection
   - name: texts
     value_type: array
     required: true
@@ -297,6 +334,7 @@ operations:
         type: string
         minLength: 1
         maxLength: 8000
+    display_name: Texts to embed (JSON array)
   - name: model
     value_type: text
     required: false
@@ -305,6 +343,7 @@ operations:
       enum:
       - text-embedding-3-small
       - text-embedding-3-large
+    display_name: Embedding model
   - name: dimensions
     value_type: integer
     required: false
@@ -312,6 +351,7 @@ operations:
       type: integer
       minimum: 1
       maximum: 3072
+    display_name: Embedding dimensions
   outputs:
   - name: vectors
     value_type: array

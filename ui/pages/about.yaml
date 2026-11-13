@@ -28,7 +28,7 @@ components:
     the required inputs and run.
 
 
-    Embed texts accepts 1–4 nonempty texts as a JSON array, each at most 8,000 UTF-8 bytes. Text is sent unchanged; OpenAI charges per input token. Select small (default 1,536 dimensions) or large (default 3,072), with optional reduced integer dimensions. Vectors follow input order; use the same model and dimensions for a vector index. Consider data sensitivity before sending text.
+    Generate text embeddings accepts 1–4 nonempty texts as a JSON array, each at most 8,000 UTF-8 bytes. Text is sent unchanged; OpenAI charges per input token. Select small (default 1,536 dimensions) or large (default 3,072), with optional reduced integer dimensions. Vectors follow input order; use the same model and dimensions for a vector index. Consider data sensitivity before sending text.
 
 
     Image inputs must be PNG, JPEG, or WebP artifacts up to 15 MB (15,000,000 bytes). Audio input is limited to 24 MB. Speech outputs MP3.
