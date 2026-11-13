@@ -86,7 +86,15 @@ Send a PNG, JPEG or WebP artifact to OpenAI moderation and return flagged plus c
 
 - **Source image artifact**: Map an image artifact from an earlier step: PNG, JPEG or WebP, up to 15000000 bytes.
 
-Uses the selected project connection; no additional action inputs.
+Example input values:
+
+```json
+{
+  "artifact_handle": "artifact:input"
+}
+```
+
+In the workflow editor, select the source artifact from the earlier step. `artifact:input` illustrates the mapped handle; replace it with the actual handle supplied by that step.
 
 ## Generate an image from a prompt
 
@@ -113,9 +121,12 @@ Example input values:
 
 ```json
 {
+  "artifact_handle": "artifact:input",
   "prompt": "Replace the background with a plain white studio background."
 }
 ```
+
+In the workflow editor, select the source artifact from the earlier step. `artifact:input` illustrates the mapped handle; replace it with the actual handle supplied by that step.
 
 ## Transcribe an audio file to text
 
@@ -128,9 +139,12 @@ Example input values:
 
 ```json
 {
+  "artifact_handle": "artifact:input",
   "filename": "meeting.wav"
 }
 ```
+
+In the workflow editor, select the source artifact from the earlier step. `artifact:input` illustrates the mapped handle; replace it with the actual handle supplied by that step.
 
 ## Generate speech from text
 
